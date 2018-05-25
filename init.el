@@ -59,6 +59,7 @@
   (require 'recentf)
   (require 'use-package))
 
+
 ;; Basic settings
 (defalias #'yes-or-no-p #'y-or-n-p)
 (setq tab-width 2)
@@ -67,6 +68,11 @@
 (setq inhibit-splash-screen t)
 (setq inhibit-startup-message t)
 
+
+;; Smooth scrolling
+(setq scroll-step           1
+      scroll-margin         0
+      scroll-conservatively 10000)
 
 ;; Hide toolbars
 (tool-bar-mode -1)
@@ -136,7 +142,29 @@
   :config
   (progn
     (require 'smartparens-config)
-(smartparens-global-mode)))
+		(smartparens-global-mode)))
+
+(use-package spaceline
+	:straight t
+	:config
+	(setq-default mode-line-format '("%e" (:eval (spaceline-ml-main)))))
+
+(use-package spaceline-config
+	:straight spaceline
+	:config
+	(spaceline-helm-mode 1)
+	(spaceline-emacs-theme)
+	(setq-default
+	 powerline-height 24
+	 powerline-default-separator 'wave
+	 spaceline-flycheck-bullet "❖ %s"
+	 spaceline-separator-dir-left '(right . right)
+	 spaceline-separator-dir-right '(left . left)
+	 ))
+
+(use-package yasnippet
+	:straight t)
+
 
 (use-package aggressive-indent
   :straight t
@@ -161,6 +189,39 @@
     (setq-default evil-escape-key-sequence "jk")
     (evil-escape-mode)))
 
+(use-package evil-surround
+  :straight t
+  :after evil
+  :preface
+  (progn
+    (defun rs--elisp/init-evil-surround-pairs ()
+      (make-local-variable 'evil-surround-pairs-alist)
+      (push '(?\` . ("`" . "'")) evil-surround-pairs-alist)))
+
+  :config
+  (progn
+    (setq-default evil-surround-pairs-alist
+                  '((?\( . ("(" . ")"))
+                    (?\[ . ("[" . "]"))
+                    (?\{ . ("{" . "}"))
+
+                    (?\) . ("(" . ")"))
+                    (?\] . ("[" . "]"))
+                    (?\} . ("{" . "}"))
+
+                    (?# . ("#{" . "}"))
+                    (?b . ("(" . ")"))
+                    (?B . ("{" . "}"))
+                    (?> . ("<" . ">"))
+                    (?$ . ("${" . "}"))
+                    (?t . evil-surround-read-tag)
+                    (?< . evil-surround-read-tag)
+                    (?f . evil-surround-function)))
+    (add-hook 'emacs-lisp-mode-hook #'rs--elisp/init-evil-surround-pairs)
+    (global-evil-surround-mode +1)
+    (evil-define-key 'visual evil-surround-mode-map "s" #'evil-surround-region)
+		(evil-define-key 'visual evil-surround-mode-map "S" #'evil-substitute)))
+
 (use-package align)
 
 (use-package which-key
@@ -181,6 +242,7 @@
   :commands
   (er/expand-region)
   )
+
 
 ;; Key mappings
 
