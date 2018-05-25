@@ -64,10 +64,13 @@
 (defalias #'yes-or-no-p #'y-or-n-p)
 (setq tab-width 2)
 
+;; Remove splash screen
 (setq initial-scratch-message nil)
 (setq inhibit-splash-screen t)
 (setq inhibit-startup-message t)
 
+;; Hack for powerline
+(setq ns-use-srgb-colorspace nil)
 
 ;; Smooth scrolling
 (setq scroll-step           1
@@ -150,21 +153,22 @@
 	(setq-default mode-line-format '("%e" (:eval (spaceline-ml-main)))))
 
 (use-package spaceline-config
-	:straight spaceline
-	:config
-	(spaceline-helm-mode 1)
-	(spaceline-emacs-theme)
-	(setq-default
-	 powerline-height 24
-	 powerline-default-separator 'wave
-	 spaceline-flycheck-bullet "❖ %s"
-	 spaceline-separator-dir-left '(right . right)
-	 spaceline-separator-dir-right '(left . left)
-	 ))
+  :straight spaceline
+  :config
+  (spaceline-helm-mode 1)
+  (spaceline-spacemacs-theme)
+  (setq-default
+   powerline-height 18
+   spaceline-flycheck-bullet "☹️%s"
+   spaceline-separator-dir-left '(right . right)
+   spaceline-separator-dir-right '(left . left)
+   spaceline-toggle-minor-modes-off
+   ))
 
 (use-package yasnippet
 	:straight t)
-
+(use-package yasnippet-snippets
+	:straight t)
 
 (use-package aggressive-indent
   :straight t
@@ -173,8 +177,10 @@
 
 
 (use-package all-the-icons
-:straight t)
+	:straight t)
 
+(use-package json-mode
+	:straight t)
 
 (use-package general
   :straight t
@@ -194,7 +200,7 @@
   :after evil
   :preface
   (progn
-    (defun rs--elisp/init-evil-surround-pairs ()
+    (defun d--elisp/init-evil-surround-pairs ()
       (make-local-variable 'evil-surround-pairs-alist)
       (push '(?\` . ("`" . "'")) evil-surround-pairs-alist)))
 
@@ -231,17 +237,34 @@
     (which-key-mode)
 		(setq which-key-idle-delay 0.0)))
 
-(use-package rainbow-delimiters
-  :straight t
-  :config
-  (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
-
 
 (use-package expand-region
   :straight t
   :commands
   (er/expand-region)
   )
+
+(use-package ws-butler
+	:straight t
+	:commands (ws-butler-global-mode)
+	:config
+(ws-butler-global-mode)
+)
+
+(use-package highlight-thing
+  :straight t
+  :commands (highlight-thing-mode)
+  :init
+  (add-hook 'prog-mode-hook #'highlight-thing-mode)
+  :config
+  (progn
+    (setq highlight-thing-what-thing 'symbol)
+    (setq highlight-thing-delay-seconds 0.5)
+    (setq highlight-thing-limit-to-defun nil)
+    (setq highlight-thing-case-sensitive-p t)
+))
+
+
 
 
 ;; Key mappings
