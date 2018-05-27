@@ -6,6 +6,13 @@
 
 ;;; Commentary:
 
+;; TODO:
+;; - Fix the title bar that has the resolution in it
+;; - Get prettier
+;; - Magit (?)
+
+
+
 ;;; Code:
 (when (version< emacs-version "26")
   (error "This version of Emacs is not supported"))
@@ -96,18 +103,18 @@
 
 ;; Themes
 
-(set-default-font "Inconsolata 16" nil t)
+(set-default-font "Fira Code 14" nil t)
 
 (use-package solarized-theme
   :straight t
   :config
   (progn
-    (setq solarized-distinct-fringe-background t)
+    (setq solarized-distinct-fringe-background nil)
     (setq solarized-use-variable-pitch nil)
+    (setq solarized-use-less-bold t)
     (setq solarized-scale-org-headlines nil)
     (setq solarized-high-contrast-mode-line t)
     (load-theme 'solarized-dark t)))
-
 
 
 ;; New packages
@@ -167,6 +174,7 @@
 
 (use-package yasnippet
 	:straight t)
+
 (use-package yasnippet-snippets
 	:straight t)
 
@@ -174,7 +182,6 @@
   :straight t
   :config
 	(add-hook 'emacs-lisp-mode-hook #'aggressive-indent-mode))
-
 
 (use-package all-the-icons
 	:straight t)
@@ -277,29 +284,48 @@
 
 (rs-leader-def
   "bb"  '(ivy-switch-buffer :which-key "prev buffer")
+  "bd"  '(bury-buffer :which-key "delete buffer")
+
   "SPC" '(counsel-M-x :which-key "M-x")
   "ff"  '(counsel-find-file :which-key "find file")
   ";" '(rs-comment-or-uncomment-region-or-line :which-key "comment")
 
   "aa" '(align-regexp :which-key "align-regexp")
+
   "v" '(er/expand-region :which-key "expand-region")
   "V" '(er/contract-region :which-key "contract-region")
-  
-  "w/"  '(evil-window-vsplit :which-key "vertical split window")
-  "w="  '(evil-window-hsplit :which-key "horizontal split window")
-  "wd"  '(evil-window-delete :which-key "delete window")
-  "tm"  '(toggle-frame-maximized :which-key "maximise window")
 
+
+	"uc" '(upcase-char :which-key "upcase char")
+	"uw" '(upcase-word :which-key "upcase word")
+	"ur" '(upcase-region :which-key "upcase region")
+
+	"dc" '(downcase-char :which-key "downcase char")
+	"dw" '(downcase-word :which-key "downcase word")
+	"dr" '(downcase-region :which-key "downcase region")
+
+	"cw" '(capitalize-word :which-key "capitalise word")
+	"cr" '(capitalize-region :which-key "capitalise region")
+
+	"sw" '(rs-word-or-region-to-snake :which-key "snake region")
+
+
+  "w/"  '(evil-window-vsplit :which-key "vertical split window")
+  "w-"  '(evil-window-split :which-key "horizontal split window")
+  "w="  '(balance-windows :which-key "balance windows")
+  "wd"  '(evil-window-delete :which-key "delete window")
   "wh" '(windmove-left :which-key "move window left")
   "wl" '(windmove-right :which-key "move window right")
   "wj" '(windmove-up :which-key "move window up")
   "wk" '(windmove-down :which-key "move window down")
+
+  "tm"  '(toggle-frame-maximized :which-key "maximise window")
   )
 
 (general-def 'motion
   "/" 'counsel-grep-or-swiper)
 
-;; Modes
+;; modes
 (use-package go-mode
   :straight t
   :mode ("\\.go\\'" . go-mode)
@@ -320,34 +346,30 @@
 
 
 
+;; weird config stuff
 
-
-
-;; Weird config stuff
-
-;; Ambient title bar mmm
+;; ambient title bar
 (when (eq system-type 'darwin)
   (progn
   (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
   (add-to-list 'default-frame-alist '(ns-appearance . 'nil))
   (setq frame-title-format nil)))
 
-
-
 (provide 'init)
 
 
 (custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
+ ;; custom-set-variables was added by custom.
+ ;; if you edit it by hand, you could mess it up, so be careful.
+ ;; your init file should contain only one such instance.
+ ;; if there is more than one, they won't work right.
  '(custom-safe-themes
    (quote
     ("8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" default))))
 (custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
+ ;; custom-set-faces was added by custom.
+ ;; if you edit it by hand, you could mess it up, so be careful.
+ ;; your init file should contain only one such instance.
+ ;; if there is more than one, they won't work right.
  )
+(put 'downcase-region 'disabled nil)
