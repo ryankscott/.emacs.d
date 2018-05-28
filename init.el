@@ -10,8 +10,6 @@
 ;; - Fix the title bar that has the resolution in it
 ;; - Get prettier
 ;; - Magit (?)
-;; - Undo/redo
-;; - evil-define-key
 
 
 ;;; Code:
@@ -129,6 +127,7 @@
   :straight t
   :config
   (evil-mode +1)
+  (define-key evil-normal-state-map "r" 'undo-tree-redo)
 )
 
 (use-package swiper
