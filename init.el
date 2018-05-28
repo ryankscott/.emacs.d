@@ -113,7 +113,7 @@
   :config
   (progn
     (require 'doom-themes)
-    (setq doom-themes-enable-bold t)
+    (setq doom-themes-enable-bold nil)
     (setq doom-themes-enable-italic nil)
 		(setq nlinum-highlight-current-line t)
     (load-theme 'doom-one t)
