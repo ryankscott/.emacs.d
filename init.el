@@ -108,11 +108,10 @@
 (use-package doom-themes
   :preface (defvar region-fg nil)
   :straight t
-	:config
-	(progn
+  :config
+  (progn
     (require 'doom-themes)
-    (setq doom-themes-enable-bold t
-          doom-themes-enable-italic t)
+    (setq doom-themes-enable-bold t)
     (load-theme 'doom-one t)))
 
 
@@ -154,10 +153,29 @@
     (require 'smartparens-config)
 		(smartparens-global-mode)))
 
+(use-package iedit
+  :straight t
+  :config
+  (progn
+		(setq iedit-toggle-key-default nil)))
+
+(use-package evil-multiedit
+  :straight t
+  :commands (evil-multiedit-match-all)
+  :config
+  (progn
+    (define-key evil-multiedit-state-map (kbd "RET") 'evil-multiedit-toggle-or-restrict-region)
+    (define-key evil-motion-state-map (kbd "RET") 'evil-multiedit-toggle-or-restrict-region)
+    (define-key evil-multiedit-state-map (kbd "C") nil)
+    (define-key evil-multiedit-state-map (kbd "S") #'evil-multiedit--substitute)
+    (define-key evil-multiedit-state-map (kbd "C-n") #'evil-multiedit-next)
+    (define-key evil-multiedit-state-map (kbd "C-p") #'evil-multiedit-prev)
+    (define-key evil-multiedit-insert-state-map (kbd "C-n") #'evil-multiedit-next)
+    (define-key evil-multiedit-insert-state-map (kbd "C-p") #'evil-multiedit-prev)))
 
 (use-package doom-modeline
   :config
-(+doom-modeline|init))
+	(+doom-modeline|init))
 
 (use-package yasnippet
 	:straight t)
@@ -214,13 +232,13 @@
                     (?B . ("{" . "}"))
                     (?> . ("<" . ">"))
                     (?$ . ("${" . "}"))
-                   (?t . evil-surround-read-tag)
+                    (?t . evil-surround-read-tag)
                     (?< . evil-surround-read-tag)
                     (?f . evil-surround-function)))
     (add-hook 'emacs-lisp-mode-hook #'rs--elisp/init-evil-surround-pairs)
     (global-evil-surround-mode +1)
     (evil-define-key 'visual evil-surround-mode-map "s" #'evil-surround-region)
-		(evil-define-key 'visual evil-surround-mode-map "S" #'evil-substitute)))
+    (evil-define-key 'visual evil-surround-mode-map "S" #'evil-substitute)))
 
 (use-package align)
 
@@ -229,7 +247,7 @@
   :config
   (progn
     (which-key-mode)
-		(setq which-key-idle-delay 0.0)))
+    (setq which-key-idle-delay 0.0)))
 
 
 (use-package expand-region
@@ -279,8 +297,6 @@
   "aa" '(align-regexp :which-key "align-regexp")
   
   "v" '(er/expand-region :which-key "expand-region")
-  "V" '(er/contract-region :which-key "contract-region")
-  
   
   "uc" '(upcase-char :which-key "upcase char")
   "uw" '(upcase-word :which-key "upcase word")
@@ -292,8 +308,8 @@
   
   "cw" '(capitalize-word :which-key "capitalise word")
   "cr" '(capitalize-region :which-key "capitalise region")
-  
-  "sw" '(rs-word-or-region-to-snake :which-key "snake region")
+
+  "se" '(evil-multiedit-match-all :which-key "multi-match-all")
   
   
   "w/"  '(evil-window-vsplit :which-key "vertical split window")
@@ -337,9 +353,9 @@
 ;; ambient title bar
 (when (eq system-type 'darwin)
   (progn
-  (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
-  (add-to-list 'default-frame-alist '(ns-appearance . 'nil))
-  (setq frame-title-format nil)))
+    (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
+    (add-to-list 'default-frame-alist '(ns-appearance . 'nil))
+    (setq frame-title-format 'nil)))
 
 (provide 'init)
 
