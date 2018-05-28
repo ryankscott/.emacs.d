@@ -194,7 +194,7 @@
   :after evil
   :preface
   (progn
-    (defun d--elisp/init-evil-surround-pairs ()
+    (defun rs--elisp/init-evil-surround-pairs ()
       (make-local-variable 'evil-surround-pairs-alist)
       (push '(?\` . ("`" . "'")) evil-surround-pairs-alist)))
 
