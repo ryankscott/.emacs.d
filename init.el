@@ -10,7 +10,8 @@
 ;; - Fix the title bar that has the resolution in it
 ;; - Get prettier
 ;; - Magit (?)
-;; - Doom emacs themes
+;; - Undo/redo
+;; - evil-define-key
 
 
 ;;; Code:
@@ -214,7 +215,7 @@
                     (?B . ("{" . "}"))
                     (?> . ("<" . ">"))
                     (?$ . ("${" . "}"))
-                    (?t . evil-surround-read-tag)
+                   (?t . evil-surround-read-tag)
                     (?< . evil-surround-read-tag)
                     (?f . evil-surround-function)))
     (add-hook 'emacs-lisp-mode-hook #'rs--elisp/init-evil-surround-pairs)
@@ -256,13 +257,12 @@
     (setq highlight-thing-delay-seconds 0.5)
     (setq highlight-thing-limit-to-defun nil)
     (setq highlight-thing-case-sensitive-p t)
-))
+    ))
 
 
 
 
 ;; Key mappings
-
 (general-create-definer rs-leader-def
   :states '(normal visual insert emacs)
   :prefix "SPC"
@@ -272,31 +272,31 @@
 (rs-leader-def
   "bb"  '(ivy-switch-buffer :which-key "prev buffer")
   "bd"  '(bury-buffer :which-key "delete buffer")
-
+  
   "SPC" '(counsel-M-x :which-key "M-x")
   "ff"  '(counsel-find-file :which-key "find file")
   ";" '(rs-comment-or-uncomment-region-or-line :which-key "comment")
-
+  
   "aa" '(align-regexp :which-key "align-regexp")
-
+  
   "v" '(er/expand-region :which-key "expand-region")
   "V" '(er/contract-region :which-key "contract-region")
-
-
-	"uc" '(upcase-char :which-key "upcase char")
-	"uw" '(upcase-word :which-key "upcase word")
-	"ur" '(upcase-region :which-key "upcase region")
-
-	"dc" '(downcase-char :which-key "downcase char")
-	"dw" '(downcase-word :which-key "downcase word")
-	"dr" '(downcase-region :which-key "downcase region")
-
-	"cw" '(capitalize-word :which-key "capitalise word")
-	"cr" '(capitalize-region :which-key "capitalise region")
-
-	"sw" '(rs-word-or-region-to-snake :which-key "snake region")
-
-
+  
+  
+  "uc" '(upcase-char :which-key "upcase char")
+  "uw" '(upcase-word :which-key "upcase word")
+  "ur" '(upcase-region :which-key "upcase region")
+  
+  "dc" '(downcase-char :which-key "downcase char")
+  "dw" '(downcase-word :which-key "downcase word")
+  "dr" '(downcase-region :which-key "downcase region")
+  
+  "cw" '(capitalize-word :which-key "capitalise word")
+  "cr" '(capitalize-region :which-key "capitalise region")
+  
+  "sw" '(rs-word-or-region-to-snake :which-key "snake region")
+  
+  
   "w/"  '(evil-window-vsplit :which-key "vertical split window")
   "w-"  '(evil-window-split :which-key "horizontal split window")
   "w="  '(balance-windows :which-key "balance windows")
@@ -305,7 +305,7 @@
   "wl" '(windmove-right :which-key "move window right")
   "wj" '(windmove-up :which-key "move window up")
   "wk" '(windmove-down :which-key "move window down")
-
+  
   "tm"  '(toggle-frame-maximized :which-key "maximise window")
   )
 
