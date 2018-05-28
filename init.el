@@ -10,7 +10,7 @@
 ;; - Fix the title bar that has the resolution in it
 ;; - Get prettier
 ;; - Magit (?)
-
+;; - Doom emacs themes
 
 
 ;;; Code:
@@ -41,6 +41,7 @@
 
 ;; Add the lisp directory
 (add-to-list 'load-path (concat user-emacs-directory "lisp"))
+
 
 ;; Install some basic packages
 
@@ -105,16 +106,15 @@
 
 (set-default-font "Fira Code 14" nil t)
 
-(use-package solarized-theme
+(use-package doom-themes
+  :preface (defvar region-fg nil)
   :straight t
-  :config
-  (progn
-    (setq solarized-distinct-fringe-background nil)
-    (setq solarized-use-variable-pitch nil)
-    (setq solarized-use-less-bold t)
-    (setq solarized-scale-org-headlines nil)
-    (setq solarized-high-contrast-mode-line t)
-    (load-theme 'solarized-dark t)))
+	:config
+	(progn
+    (require 'doom-themes)
+    (setq doom-themes-enable-bold t
+          doom-themes-enable-italic t)
+    (load-theme 'doom-one t)))
 
 
 ;; New packages
@@ -154,23 +154,10 @@
     (require 'smartparens-config)
 		(smartparens-global-mode)))
 
-(use-package spaceline
-	:straight t
-	:config
-	(setq-default mode-line-format '("%e" (:eval (spaceline-ml-main)))))
 
-(use-package spaceline-config
-  :straight spaceline
+(use-package doom-modeline
   :config
-  (spaceline-helm-mode 1)
-  (spaceline-spacemacs-theme)
-  (setq-default
-   powerline-height 18
-   spaceline-flycheck-bullet "☹️%s"
-   spaceline-separator-dir-left '(right . right)
-   spaceline-separator-dir-right '(left . left)
-   spaceline-toggle-minor-modes-off
-   ))
+(+doom-modeline|init))
 
 (use-package yasnippet
 	:straight t)

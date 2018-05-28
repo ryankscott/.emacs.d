@@ -13,7 +13,7 @@
 ;;; ui/doom-modeline/config.el -*- lexical-binding: t; -*-
 
 (eval-when-compile
-  (require 'straight))
+  (st 'use-package))
 
 (require 'all-the-icons)
 (require 'doom-helpers)
@@ -21,7 +21,7 @@
 (require 'shrink-path)
 
 (use-package eldoc-eval
-  :straight t
+  :ensure t
   :config
   (defun +doom-modeline-eldoc (text)
     (concat (when (display-graphic-p)
