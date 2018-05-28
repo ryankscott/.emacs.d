@@ -90,6 +90,8 @@
 (toggle-scroll-bar -1)
 (horizontal-scroll-bar-mode -1)
 
+
+
 ;; Functions
 (defun rs-comment-or-uncomment-region-or-line ()
   "Comments or uncomments the region or the current line if there's no active region."
@@ -112,26 +114,31 @@
   (progn
     (require 'doom-themes)
     (setq doom-themes-enable-bold t)
-    (load-theme 'doom-one t)))
+    (setq doom-themes-enable-italic nil)
+		(setq nlinum-highlight-current-line t)
+    (load-theme 'doom-one t)
+    (doom-themes-visual-bell-config)
+    (doom-themes-neotree-config)
+    ))
 
 
 ;; New packages
+(use-package nlinum
+	:straight t
+  :config
+  (global-nlinum-mode))
+
+
 (use-package ivy
   :straight t
   :config
   (define-key ivy-minibuffer-map (kbd "<escape>") 'minibuffer-keyboard-quit)
-)
+  )
 
-(use-package evil
-  :straight t
-  :config
-  (evil-mode +1)
-  (define-key evil-normal-state-map "r" 'undo-tree-redo)
-)
 
 (use-package swiper
   :straight t
-)
+	)
 
 (use-package counsel
   :straight t
@@ -159,6 +166,18 @@
   (progn
 		(setq iedit-toggle-key-default nil)))
 
+
+(use-package evil
+  :straight t
+  :config
+  (evil-mode +1)
+  (define-key evil-normal-state-map "r" 'undo-tree-redo)
+	(evil-define-key 'normal neotree-mode-map (kbd "TAB") 'neotree-enter)
+  (evil-define-key 'normal neotree-mode-map (kbd "SPC") 'neotree-quick-look)
+  (evil-define-key 'normal neotree-mode-map (kbd "q") 'neotree-hide)
+  (evil-define-key 'normal neotree-mode-map (kbd "RET") 'neotree-enter)
+	)
+
 (use-package evil-multiedit
   :straight t
   :commands (evil-multiedit-match-all)
@@ -172,32 +191,6 @@
     (define-key evil-multiedit-state-map (kbd "C-p") #'evil-multiedit-prev)
     (define-key evil-multiedit-insert-state-map (kbd "C-n") #'evil-multiedit-next)
     (define-key evil-multiedit-insert-state-map (kbd "C-p") #'evil-multiedit-prev)))
-
-(use-package doom-modeline
-  :config
-	(+doom-modeline|init))
-
-(use-package yasnippet
-	:straight t)
-
-(use-package yasnippet-snippets
-	:straight t)
-
-(use-package aggressive-indent
-  :straight t
-  :config
-	(add-hook 'emacs-lisp-mode-hook #'aggressive-indent-mode))
-
-(use-package all-the-icons
-	:straight t)
-
-(use-package json-mode
-	:straight t)
-
-(use-package general
-  :straight t
-  :config
-  (general-override-mode))
 
 (use-package evil-escape
   :straight t
@@ -240,6 +233,34 @@
     (evil-define-key 'visual evil-surround-mode-map "s" #'evil-surround-region)
     (evil-define-key 'visual evil-surround-mode-map "S" #'evil-substitute)))
 
+(use-package doom-modeline
+  :config
+	(+doom-modeline|init))
+
+(use-package yasnippet
+	:straight t)
+
+(use-package yasnippet-snippets
+	:straight t)
+
+(use-package aggressive-indent
+  :straight t
+  :config
+	(add-hook 'emacs-lisp-mode-hook #'aggressive-indent-mode))
+
+(use-package all-the-icons
+	:straight t)
+
+
+(use-package json-mode
+	:straight t)
+
+(use-package general
+  :straight t
+  :config
+  (general-override-mode))
+
+
 (use-package align)
 
 (use-package which-key
@@ -277,6 +298,10 @@
     ))
 
 
+(use-package neotree
+  :straight t
+  )
+
 
 
 ;; Key mappings
@@ -310,7 +335,8 @@
   "cr" '(capitalize-region :which-key "capitalise region")
 
   "se" '(evil-multiedit-match-all :which-key "multi-match-all")
-  
+
+  "nt" '(neotree-toggle :which-key "neotree")
   
   "w/"  '(evil-window-vsplit :which-key "vertical split window")
   "w-"  '(evil-window-split :which-key "horizontal split window")
@@ -357,21 +383,8 @@
     (add-to-list 'default-frame-alist '(ns-appearance . 'nil))
     (setq frame-title-format 'nil)))
 
-(provide 'init)
 
-
-(custom-set-variables
- ;; custom-set-variables was added by custom.
- ;; if you edit it by hand, you could mess it up, so be careful.
- ;; your init file should contain only one such instance.
- ;; if there is more than one, they won't work right.
- '(custom-safe-themes
-   (quote
-    ("8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" default))))
-(custom-set-faces
- ;; custom-set-faces was added by custom.
- ;; if you edit it by hand, you could mess it up, so be careful.
- ;; your init file should contain only one such instance.
- ;; if there is more than one, they won't work right.
- )
 (put 'downcase-region 'disabled nil)
+
+(provide 'init)
+;;; init.el ends here
