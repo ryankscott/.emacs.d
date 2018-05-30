@@ -10,7 +10,8 @@
 ;; - Fix the title bar that has the resolution in it
 ;; - Get prettier
 ;; - Magit (?)
-
+;; - get tabs to indent
+;; - goto def is broken
 
 ;;; Code:
 (when (version< emacs-version "26")
@@ -76,9 +77,6 @@
 (setq inhibit-splash-screen t)
 (setq inhibit-startup-message t)
 
-;; Hack for powerline
-(setq ns-use-srgb-colorspace nil)
-
 ;; Smooth scrolling
 (setq scroll-step           1
       scroll-margin         0
@@ -90,6 +88,18 @@
 (toggle-scroll-bar -1)
 (horizontal-scroll-bar-mode -1)
 
+;; Enable hideshow in all programming buffers.
+
+(autoload 'hs-minor-mode "hideshow")
+(add-hook 'prog-mode-hook 'hs-minor-mode)
+
+
+;; Use path from shell for Golang
+(use-package exec-path-from-shell
+  :straight t
+  :config
+  (exec-path-from-shell-initialize)
+  (exec-path-from-shell-copy-env "GOPATH"))
 
 
 ;; Functions
@@ -115,7 +125,7 @@
     (require 'doom-themes)
     (setq doom-themes-enable-bold nil)
     (setq doom-themes-enable-italic nil)
-		(setq nlinum-highlight-current-line t)
+	(setq nlinum-highlight-current-line t)
     (load-theme 'doom-one t)
     (doom-themes-visual-bell-config)
     (doom-themes-neotree-config)
@@ -123,11 +133,34 @@
 
 
 ;; New packages
+
+(use-package rainbow-mode
+  :straight t)
+
 (use-package nlinum
-	:straight t
+  :straight t
   :config
   (global-nlinum-mode))
 
+(use-package company
+  :straight t
+	:commands (global-company-mode)
+	:init
+  (add-hook 'after-init-hook #'global-company-mode)
+	)
+
+(use-package company-go
+  :straight t
+  :after go-mode
+  :config
+  (progn
+    (setq company-go-show-annotation t)
+    (setq company-idle-delay .2)
+    (setq company-echo-delay 0)
+    (add-hook 'go-mode-hook
+			  (lambda ()
+				(set (make-local-variable 'company-backends) '(company-go))
+				(company-mode)))))
 
 (use-package ivy
   :straight t
@@ -302,6 +335,10 @@
   :straight t
   )
 
+(use-package go-rename
+  :straight t
+  :after go-mode
+	)
 
 
 ;; Key mappings
@@ -363,15 +400,26 @@
     (setq-local tab-width 4)
     (setq-local indent-tabs-mode t)
 
-    (add-hook 'before-save-hook 'gofmt-before-save)
+    (add-hook 'before-save-hook 'gofmt-before-save))
+	)
 
-    (use-package go-rename
-      :straight t
-      :after go-mode
-      :config)
-    )
+(use-package web-mode
+  :straight t
+  :config
+  (require 'web-mode)
+  (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.json\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.css\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.xml\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.js[x]?\\'" . web-mode))
   )
-
 
 
 ;; weird config stuff
@@ -381,10 +429,24 @@
   (progn
     (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
     (add-to-list 'default-frame-alist '(ns-appearance . 'nil))
-    (setq frame-title-format 'nil)))
+    (setq frame-title-format nil)))
 
 
 (put 'downcase-region 'disabled nil)
 
 (provide 'init)
 ;;; init.el ends here
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   (quote
+	("1c6546c19d5c420a03ea2cb12ec56388a8931e786e47f5c96b23262001d001c7" "329e97dffff82b5b177b767f1dd299197b285e24ba7a85180bda9da2c5143cc4" "dce530e4dff6ca98607aae0e367847ba39e8e26ba4e36ba77924ecfa5420de45" default))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
