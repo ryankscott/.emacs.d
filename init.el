@@ -125,15 +125,14 @@
     (require 'doom-themes)
     (setq doom-themes-enable-bold nil)
     (setq doom-themes-enable-italic nil)
-	(setq nlinum-highlight-current-line t)
-    (load-theme 'doom-one t)
+    (setq nlinum-highlight-current-line t)
     (doom-themes-visual-bell-config)
     (doom-themes-neotree-config)
+    (load-theme 'doom-solarized-light t)
     ))
 
 
 ;; New packages
-
 (use-package rainbow-mode
   :straight t)
 
