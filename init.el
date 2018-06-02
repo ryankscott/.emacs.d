@@ -133,6 +133,15 @@
 
 
 ;; New packages
+(use-package magit
+  :straight t
+  :defer t
+  :commands (magit-status magit-blame magit-branch-and-checkout)
+  :functions (magit-display-buffer-fullframe-status-v1)
+)
+
+
+
 (use-package rainbow-mode
   :straight t)
 
@@ -388,7 +397,6 @@
 
 (general-def 'motion
   "/" 'counsel-grep-or-swiper)
-
 ;; modes
 (use-package go-mode
   :straight t
