@@ -94,6 +94,10 @@
 (add-hook 'prog-mode-hook 'hs-minor-mode)
 
 
+;; Highlight matching parens by default
+(show-paren-mode 1)
+
+
 ;; Use path from shell for Golang
 (use-package exec-path-from-shell
   :straight t
@@ -138,8 +142,7 @@
   :defer t
   :commands (magit-status magit-blame magit-branch-and-checkout)
   :functions (magit-display-buffer-fullframe-status-v1)
-)
-
+  )
 
 
 (use-package rainbow-mode
@@ -379,6 +382,8 @@
   "cw" '(capitalize-word :which-key "capitalise word")
   "cr" '(capitalize-region :which-key "capitalise region")
 
+	"gs" '(magit-status :which-key "magit status")
+	
   "se" '(evil-multiedit-match-all :which-key "multi-match-all")
 
   "nt" '(neotree-toggle :which-key "neotree")
@@ -397,7 +402,8 @@
 
 (general-def 'motion
   "/" 'counsel-grep-or-swiper)
-;; modes
+
+;; Modes
 (use-package go-mode
   :straight t
   :mode ("\\.go\\'" . go-mode)
@@ -429,9 +435,8 @@
   )
 
 
-;; weird config stuff
 
-;; ambient title bar
+;; Ambient title bar
 (when (eq system-type 'darwin)
   (progn
     (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
@@ -443,17 +448,3 @@
 
 (provide 'init)
 ;;; init.el ends here
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(custom-safe-themes
-   (quote
-	("1c6546c19d5c420a03ea2cb12ec56388a8931e786e47f5c96b23262001d001c7" "329e97dffff82b5b177b767f1dd299197b285e24ba7a85180bda9da2c5143cc4" "dce530e4dff6ca98607aae0e367847ba39e8e26ba4e36ba77924ecfa5420de45" default))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
