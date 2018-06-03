@@ -145,6 +145,13 @@
   :functions (magit-display-buffer-fullframe-status-v1)
   )
 
+(use-package multi-term
+	:straight t
+	:config
+	(setq multi-term-program "/bin/zsh")
+	)
+
+
 
 (use-package rainbow-mode
   :straight t)
@@ -194,9 +201,20 @@
   :straight t
   )
 
+(use-package counsel-projectile
+  :straight t
+  :defer t
+  :commands (counsel-projectile-mode
+             counsel-projectile-find-dir
+             counsel-projectile-switch-project
+             counsel-projectile-switch-to-buffer
+             counsel-projectile-rg)
+	)
+
+
 (use-package flycheck
   :straight t
-:init (global-flycheck-mode))
+	:init (global-flycheck-mode))
 
 (use-package smartparens
   :straight t
@@ -346,7 +364,6 @@
 (use-package neotree
   :straight t
   )
-
 (use-package go-rename
   :straight t
   :after go-mode
@@ -388,7 +405,12 @@
   "se" '(evil-multiedit-match-all :which-key "multi-match-all")
 
   "nt" '(neotree-toggle :which-key "neotree")
-  
+
+	"pn" '(neotree-projectile-action :which-key "project tree")
+  "pb" '(counsel-projectile-switch-to-buffer :which-key "project switch to buffer")
+  "pp" '(counsel-projectile-switch-project :which-key "project switch")
+	"/" '(counsel-projectile-rg :which-key "project search")
+	
   "w/"  '(evil-window-vsplit :which-key "vertical split window")
   "w-"  '(evil-window-split :which-key "horizontal split window")
   "w="  '(balance-windows :which-key "balance windows")
