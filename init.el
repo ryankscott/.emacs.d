@@ -89,10 +89,11 @@
 (horizontal-scroll-bar-mode -1)
 
 ;; Enable hideshow in all programming buffers.
-
 (autoload 'hs-minor-mode "hideshow")
 (add-hook 'prog-mode-hook 'hs-minor-mode)
 
+;; Add prettier to web-mode
+(add-hook 'web-mode-hook 'prettier-js-mode)
 
 ;; Highlight matching parens by default
 (show-paren-mode 1)
@@ -398,8 +399,9 @@
   "wk" '(windmove-down :which-key "move window down")
   
   "tm"  '(toggle-frame-maximized :which-key "maximise window")
-  )
+	)
 
+;; Swiper definition
 (general-def 'motion
   "/" 'counsel-grep-or-swiper)
 
@@ -433,6 +435,11 @@
   (add-to-list 'auto-mode-alist '("\\.xml\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.js[x]?\\'" . web-mode))
   )
+
+(use-package prettier-js
+	:straight t
+	:after web-mode
+	)
 
 
 
