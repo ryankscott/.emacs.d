@@ -106,6 +106,12 @@
   (exec-path-from-shell-initialize)
   (exec-path-from-shell-copy-env "GOPATH"))
 
+;; Enable commands.
+(put 'narrow-to-region 'disabled nil)
+(put 'upcase-region 'disabled nil)
+(put 'downcase-region 'disabled nil)
+(put 'downcase-char 'disabled nil)
+(put 'erase-buffer 'disabled nil)
 
 ;; Functions
 (defun rs-comment-or-uncomment-region-or-line ()
@@ -199,17 +205,41 @@
 
 (use-package projectile
   :straight t
-  )
+  :config
+  (progn
+    (setq projectile-completion-system 'ivy)
+    (setq projectile-switch-project-action 'magit-status)
+    (setq projectile-enable-caching t)
+
+    (setq projectile-globally-ignored-files '("TAGS" ".DS_Store"))
+    (setq projectile-globally-ignored-file-suffixes '("gz" "zip" "tar" "elc"))
+    (setq projectile-globally-ignored-directories
+          '(".bzr"
+            ".ensime_cache"
+            ".eunit"
+            ".fslckout"
+            ".g8"
+            ".git"
+            ".hg"
+            ".idea"
+            ".stack-work"
+            ".svn"
+            "build"
+            "dist"
+            "node_modules"
+            "target"))
+    (projectile-mode)))
 
 (use-package counsel-projectile
   :straight t
   :defer t
   :commands (counsel-projectile-mode
+	     counsel-projectile-find-file
              counsel-projectile-find-dir
              counsel-projectile-switch-project
              counsel-projectile-switch-to-buffer
              counsel-projectile-rg)
-	)
+  )
 
 
 (use-package flycheck
@@ -389,28 +419,28 @@
   
   "v" '(er/expand-region :which-key "expand-region")
   
-  "uc" '(upcase-char :which-key "upcase char")
   "uw" '(upcase-word :which-key "upcase word")
   "ur" '(upcase-region :which-key "upcase region")
   
-  "dc" '(downcase-char :which-key "downcase char")
   "dw" '(downcase-word :which-key "downcase word")
   "dr" '(downcase-region :which-key "downcase region")
   
   "cw" '(capitalize-word :which-key "capitalise word")
   "cr" '(capitalize-region :which-key "capitalise region")
 
-	"gs" '(magit-status :which-key "magit status")
-	
+  "gs" '(magit-status :which-key "magit status")
+  
   "se" '(evil-multiedit-match-all :which-key "multi-match-all")
 
   "nt" '(neotree-toggle :which-key "neotree")
 
-	"pn" '(neotree-projectile-action :which-key "project tree")
+  "pn" '(neotree-projectile-action :which-key "project tree")
+  "pf" '(counsel-projectile-find-file :which-key "project find file")
+
   "pb" '(counsel-projectile-switch-to-buffer :which-key "project switch to buffer")
-  "pp" '(counsel-projectile-switch-project :which-key "project switch")
-	"/" '(counsel-projectile-rg :which-key "project search")
-	
+  "ps" '(counsel-projectile-switch-project :which-key "project switch")
+  "/" '(counsel-projectile-rg :which-key "project search")
+  
   "w/"  '(evil-window-vsplit :which-key "vertical split window")
   "w-"  '(evil-window-split :which-key "horizontal split window")
   "w="  '(balance-windows :which-key "balance windows")
@@ -421,7 +451,7 @@
   "wk" '(windmove-down :which-key "move window down")
   
   "tm"  '(toggle-frame-maximized :which-key "maximise window")
-	)
+  )
 
 ;; Swiper definition
 (general-def 'motion
