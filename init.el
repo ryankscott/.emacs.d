@@ -447,8 +447,8 @@
   "wd"  '(evil-window-delete :which-key "delete window")
   "wh" '(windmove-left :which-key "move window left")
   "wl" '(windmove-right :which-key "move window right")
-  "wj" '(windmove-up :which-key "move window up")
-  "wk" '(windmove-down :which-key "move window down")
+  "wk" '(windmove-up :which-key "move window up")
+  "wj" '(windmove-down :which-key "move window down")
   
   "tm"  '(toggle-frame-maximized :which-key "maximise window")
   )
@@ -468,7 +468,7 @@
     (setq-local indent-tabs-mode t)
 
     (add-hook 'before-save-hook 'gofmt-before-save))
-	)
+  )
 
 (use-package web-mode
   :straight t
