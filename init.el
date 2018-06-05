@@ -151,11 +151,15 @@
   :functions (magit-display-buffer-fullframe-status-v1)
   )
 
+(use-package evil-magit
+  :straight t
+  :after magit)
+
 (use-package multi-term
-	:straight t
-	:config
-	(setq multi-term-program "/bin/zsh")
-	)
+  :straight t
+  :config
+  (setq multi-term-program "/bin/zsh")
+  )
 
 
 
