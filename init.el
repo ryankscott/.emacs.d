@@ -155,13 +155,6 @@
   :straight t
   :after magit)
 
-(use-package multi-term
-  :straight t
-  :config
-  (setq multi-term-program "/bin/zsh")
-  )
-
-
 
 (use-package rainbow-mode
   :straight t)
