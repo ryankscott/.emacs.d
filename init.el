@@ -123,7 +123,6 @@
       (setq beg (line-beginning-position) end (line-end-position)))
     (comment-or-uncomment-region beg end)))
 
-
 ;; Themes
 
 (set-default-font "Fira Code 14" nil t)
@@ -180,9 +179,9 @@
     (setq company-idle-delay .2)
     (setq company-echo-delay 0)
     (add-hook 'go-mode-hook
-			  (lambda ()
-				(set (make-local-variable 'company-backends) '(company-go))
-				(company-mode)))))
+							(lambda ()
+								(set (make-local-variable 'company-backends) '(company-go))
+								(company-mode)))))
 
 (use-package ivy
   :straight t
@@ -391,10 +390,8 @@
 (use-package neotree
   :straight t
   )
-(use-package go-rename
-  :straight t
-  :after go-mode
-	)
+
+
 
 
 ;; Key mappings
@@ -403,6 +400,7 @@
   :prefix "SPC"
   :keymaps 'override
   :non-normal-prefix "M-SPC")
+
 
 (rs-leader-def
   "bb"  '(ivy-switch-buffer :which-key "prev buffer")
@@ -446,9 +444,13 @@
   "wl" '(windmove-right :which-key "move window right")
   "wk" '(windmove-up :which-key "move window up")
   "wj" '(windmove-down :which-key "move window down")
+  "wr"  '(evil-window-rotate-downwards :which-key "rotate window down")
+  "wR"  '(evil-window-rotate-upwards :which-key "rotate window up")
   
   "tm"  '(toggle-frame-maximized :which-key "maximise window")
   )
+
+
 
 ;; Swiper definition
 (general-def 'motion
@@ -460,11 +462,68 @@
   :mode ("\\.go\\'" . go-mode)
   :config
   (progn
-    (setq gofmt-command "goimports")
     (setq-local tab-width 4)
     (setq-local indent-tabs-mode t)
+    (setq gofmt-command "goreturns")
+    (setq godoc-at-point-function 'godoc-gogetdoc)
+    (setq gofmt-show-errors nil)
+    (evil-define-key 'normal go-mode-map (kbd "K") #'godoc-at-point)
+    (evil-define-key 'normal go-mode-map (kbd "gd") #'godef-jump)
+    (evil-define-key 'insert go-mode-map (kbd "M-.") #'godef-jump)
 
-    (add-hook 'before-save-hook 'gofmt-before-save))
+    (add-hook 'before-save-hook #'gofmt-before-save))
+
+  :functions (gofmt-before-save godoc-at-point))
+
+(use-package go-rename
+  :straight t
+  :after go-mode
+  )
+
+(use-package godoctor
+  :straight t
+  :init
+  )
+
+(use-package go-rename
+  :straight t
+  :after go-mode
+  )
+
+(use-package go-tag
+  :straight t
+  :after go-mode
+  )
+
+(use-package go-eldoc
+  :straight t
+  :after go-mode
+  :config
+  (add-hook 'go-mode-hook 'go-eldoc-setup))
+
+(general-def
+  :keymaps 'go-mode-map
+  :states 'motion
+  :prefix "SPC g"
+  "hh" '(godoc-at-point :which-key "godoc-at-point")
+  "ig" '(go-goto-imports :which-key "go-goto-imports")
+  "ia" '(go-import-add :which-key "go-import-add")
+  "ir" '(go-remove-unused-imports :which-key "go-remove-unused-imports")
+
+  "er" '(go-play-region :which-key "go-play-region")
+  "ed" '(go-download-play :which-key "go-download-play")
+
+  "gj" '(godef-jump :which-key "godef-jump")
+  "gd" '(godef-describe :which-key "godef-describe")
+  "gw" '(godef-jump-other-window :which-key "godef-jump-other-window")
+
+  "dr" '(godoctor-rename :which-key "godoctor-rename")
+  "de" '(godoctor-extract :which-key "godoctor-extract")
+  "dt" '(godoctor-toggle :which-key "godoctor-toggle")
+  "dg" '(godoctor-godoc :which-key "godoctor-godoc")
+
+  "ta" '(go-tag-add :which-key "go-tag-add")
+  "tr" '(go-tag-remove :which-key "go-tag-remove")
   )
 
 (use-package web-mode
@@ -486,9 +545,9 @@
   )
 
 (use-package prettier-js
-	:straight t
-	:after web-mode
-	)
+  :straight t
+  :after web-mode
+  )
 
 
 
