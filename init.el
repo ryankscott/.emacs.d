@@ -9,7 +9,6 @@
 ;; TODO:
 ;; - Fix the title bar that has the resolution in it
 ;; - Get prettier
-;; - Magit (?)
 ;; - get tabs to indent
 ;; - goto def is broken
 
@@ -40,6 +39,7 @@
 
 
 ;; Add the lisp directory
+
 (add-to-list 'load-path (concat user-emacs-directory "lisp"))
 
 
@@ -126,6 +126,12 @@
 ;; Themes
 
 (set-default-font "Fira Code 14" nil t)
+
+
+;; Smart tabs
+(require 'smart-tab)
+(global-smart-tab-mode 1)
+
 
 (use-package doom-themes
   :preface (defvar region-fg nil)
@@ -403,6 +409,12 @@
   :straight t
   )
 
+(use-package sql-indent
+  :straight (:host github :repo "alex-hhh/emacs-sql-indent"
+                   :branch "master")
+  :after sql
+  :config
+  (add-hook 'sql-mode-hook #'sqlind-minor-mode))
 
 
 
@@ -561,14 +573,11 @@
   :after web-mode
   )
 
-
-
 ;; Ambient title bar
 (when (eq system-type 'darwin)
-  (progn
-    (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
-    (add-to-list 'default-frame-alist '(ns-appearance . 'nil))
-    (setq frame-title-format nil)))
+  (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
+  (add-to-list 'default-frame-alist '(ns-appearance . 'nil))
+  (setq frame-title-format nil))
 
 
 (put 'downcase-region 'disabled nil)
