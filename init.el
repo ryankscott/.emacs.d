@@ -247,13 +247,25 @@
   :config
   (progn
     (require 'smartparens-config)
-		(smartparens-global-mode)))
+    (smartparens-global-mode)))
+
+;; Add an additional new line and indent when using smartparens
+(sp-local-pair 'prog-mode "{" nil :post-handlers '((rs-create-newline-and-enter-sexp "RET")))
+(defun rs-create-newline-and-enter-sexp (&rest _ignored)
+  "Open a new brace or bracket expression, with relevant newlines and indent."
+  (newline)
+  (indent-according-to-mode)
+  (forward-line -1)
+  (indent-according-to-mode))
+
+
+
 
 (use-package iedit
   :straight t
   :config
   (progn
-		(setq iedit-toggle-key-default nil)))
+    (setq iedit-toggle-key-default nil)))
 
 
 (use-package evil
