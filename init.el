@@ -160,7 +160,6 @@
   :straight t
   :after magit)
 
-
 (use-package rainbow-mode
   :straight t)
 
@@ -185,9 +184,9 @@
     (setq company-idle-delay .2)
     (setq company-echo-delay 0)
     (add-hook 'go-mode-hook
-							(lambda ()
-								(set (make-local-variable 'company-backends) '(company-go))
-								(company-mode)))))
+	      (lambda ()
+		(set (make-local-variable 'company-backends) '(company-go))
+		(company-mode)))))
 
 (use-package ivy
   :straight t
@@ -198,12 +197,12 @@
 
 (use-package swiper
   :straight t
-	)
+  )
 
 (use-package counsel
   :straight t
   :after swiper
-)
+  )
 
 (use-package projectile
   :straight t
@@ -246,14 +245,16 @@
 
 (use-package flycheck
   :straight t
-	:init (global-flycheck-mode))
+  :init (global-flycheck-mode)
+  )
 
 (use-package smartparens
   :straight t
   :config
   (progn
     (require 'smartparens-config)
-    (smartparens-global-mode)))
+    (smartparens-global-mode))
+  )
 
 ;; Add an additional new line and indent when using smartparens
 (sp-local-pair 'prog-mode "{" nil :post-handlers '((rs-create-newline-and-enter-sexp "RET")))
@@ -262,7 +263,8 @@
   (newline)
   (indent-according-to-mode)
   (forward-line -1)
-  (indent-according-to-mode))
+  (indent-according-to-mode)
+  )
 
 
 
@@ -271,7 +273,8 @@
   :straight t
   :config
   (progn
-    (setq iedit-toggle-key-default nil)))
+    (setq iedit-toggle-key-default nil))
+  )
 
 
 (use-package evil
@@ -279,11 +282,11 @@
   :config
   (evil-mode +1)
   (define-key evil-normal-state-map "r" 'undo-tree-redo)
-	(evil-define-key 'normal neotree-mode-map (kbd "TAB") 'neotree-enter)
+  (evil-define-key 'normal neotree-mode-map (kbd "TAB") 'neotree-enter)
   (evil-define-key 'normal neotree-mode-map (kbd "SPC") 'neotree-quick-look)
   (evil-define-key 'normal neotree-mode-map (kbd "q") 'neotree-hide)
   (evil-define-key 'normal neotree-mode-map (kbd "RET") 'neotree-enter)
-	)
+  )
 
 (use-package evil-multiedit
   :straight t
@@ -305,7 +308,8 @@
   :config
   (progn
     (setq-default evil-escape-key-sequence "jk")
-    (evil-escape-mode)))
+    (evil-escape-mode))
+  )
 
 (use-package evil-surround
   :straight t
@@ -314,8 +318,8 @@
   (progn
     (defun rs--elisp/init-evil-surround-pairs ()
       (make-local-variable 'evil-surround-pairs-alist)
-      (push '(?\` . ("`" . "'")) evil-surround-pairs-alist)))
-
+      (push '(?\` . ("`" . "'")) evil-surround-pairs-alist))
+    )
   :config
   (progn
     (setq-default evil-surround-pairs-alist
@@ -338,34 +342,41 @@
     (add-hook 'emacs-lisp-mode-hook #'rs--elisp/init-evil-surround-pairs)
     (global-evil-surround-mode +1)
     (evil-define-key 'visual evil-surround-mode-map "s" #'evil-surround-region)
-    (evil-define-key 'visual evil-surround-mode-map "S" #'evil-substitute)))
+    (evil-define-key 'visual evil-surround-mode-map "S" #'evil-substitute))
+  )
 
 (use-package doom-modeline
   :config
-	(+doom-modeline|init))
+  (+doom-modeline|init)
+  )
 
 (use-package yasnippet
-	:straight t)
+  :straight t
+  )
 
 (use-package yasnippet-snippets
-	:straight t)
+  :straight t
+  )
 
 (use-package aggressive-indent
   :straight t
   :config
-	(add-hook 'emacs-lisp-mode-hook #'aggressive-indent-mode))
+  (add-hook 'emacs-lisp-mode-hook #'aggressive-indent-mode)
+  )
 
 (use-package all-the-icons
-	:straight t)
-
+  :straight t
+  )
 
 (use-package json-mode
-	:straight t)
+  :straight t
+  )
 
 (use-package general
   :straight t
   :config
-  (general-override-mode))
+  (general-override-mode)
+  )
 
 
 (use-package align)
@@ -375,7 +386,8 @@
   :config
   (progn
     (which-key-mode)
-    (setq which-key-idle-delay 0.0)))
+    (setq which-key-idle-delay 0.0))
+  )
 
 
 (use-package expand-region
@@ -385,11 +397,11 @@
   )
 
 (use-package ws-butler
-	:straight t
-	:commands (ws-butler-global-mode)
-	:config
-(ws-butler-global-mode)
-)
+  :straight t
+  :commands (ws-butler-global-mode)
+  :config
+  (ws-butler-global-mode)
+  )
 
 (use-package highlight-thing
   :straight t
@@ -402,7 +414,8 @@
     (setq highlight-thing-delay-seconds 0.5)
     (setq highlight-thing-limit-to-defun nil)
     (setq highlight-thing-case-sensitive-p t)
-    ))
+    )
+  )
 
 
 (use-package neotree
@@ -414,10 +427,47 @@
                    :branch "master")
   :after sql
   :config
-  (add-hook 'sql-mode-hook #'sqlind-minor-mode))
+  (add-hook 'sql-mode-hook #'sqlind-minor-mode)
+  )
+
+(use-package restclient
+  :straight t
+  :commands (restclient-mode
+             restclient-http-send-current
+             restclient-jump-next
+             restclient-jump-prev
+	     restclient-http-send-current-stay-in-window)
+  :config
+  (progn
+    (setq restclient-same-buffer-response-name "*restclient*")
+    (with-eval-after-load 'which-key
+      (with-no-warnings
+        (push `((nil . ,(rx bos "restclient-http-" (group (+ nonl)))) . (nil . "\\1"))
+              which-key-replacement-alist)))
+
+    (add-to-list 'display-buffer-alist
+                 `(,(rx bos "*restclient*" eos)
+                   (display-buffer-reuse-window
+                    display-buffer-pop-up-window)
+                   (reusable-frames . visible)
+                   (side            . bottom)
+		   (window-height . 0.66))))
+  )
 
 
+(general-def
+  :keymaps 'restclient-mode-map
+  :states 'motion
+  :prefix "SPC r"
+  "c" '(restclient-http-send-current :which-key "send-current")
+  "o" '(restclient-http-send-current-stay-in-window :which-key "send-current-in-window")
+  )
 
+(general-def
+  :keymaps 'restclient-mode-map
+  "C-n" '(restclient-jump-next :which-key "jump-next")
+  "C-p" '(restclient-jump-prev :which-key "jump-prev")
+  )
 ;; Key mappings
 (general-create-definer rs-leader-def
   :states '(normal visual insert emacs)
@@ -491,10 +541,6 @@
     (setq gofmt-command "goreturns")
     (setq godoc-at-point-function 'godoc-gogetdoc)
     (setq gofmt-show-errors nil)
-    (evil-define-key 'normal go-mode-map (kbd "K") #'godoc-at-point)
-    (evil-define-key 'normal go-mode-map (kbd "gd") #'godef-jump)
-    (evil-define-key 'insert go-mode-map (kbd "M-.") #'godef-jump)
-
     (add-hook 'before-save-hook #'gofmt-before-save))
 
   :functions (gofmt-before-save godoc-at-point))
