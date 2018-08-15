@@ -9,7 +9,6 @@
 ;; TODO:
 ;; - Fix the title bar that has the resolution in it
 ;; - Get prettier
-;; - get tabs to indent
 ;; - goto def is broken
 
 ;;; Code:
@@ -72,6 +71,9 @@
 (defalias #'yes-or-no-p #'y-or-n-p)
 (setq tab-width 2)
 
+;; Don't autosave
+(setq make-backup-files nil)
+
 ;; Remove splash screen
 (setq initial-scratch-message nil)
 (setq inhibit-splash-screen t)
@@ -98,6 +100,8 @@
 ;; Highlight matching parens by default
 (show-paren-mode 1)
 
+;; Evil breaks cursor settings in Hydra buffers
+(setq-default cursor-in-non-selected-windows nil)
 
 ;; Use path from shell for Golang
 (use-package exec-path-from-shell
@@ -122,6 +126,11 @@
         (setq beg (region-beginning) end (region-end))
       (setq beg (line-beginning-position) end (line-end-position)))
     (comment-or-uncomment-region beg end)))
+
+(defun rs-connect-media ()
+  "Opens a dired instance for my media pc."
+  (interactive)
+  (dired "/ssh:ryan@192.168.1.16:/"))
 
 ;; Themes
 
@@ -149,6 +158,16 @@
 
 
 ;; New packages
+
+(use-package hydra
+  :straight t
+  :config
+  (setq lv-use-separator t))
+
+
+;; LSP
+
+
 (use-package magit
   :straight t
   :defer t
@@ -194,6 +213,9 @@
   (define-key ivy-minibuffer-map (kbd "<escape>") 'minibuffer-keyboard-quit)
   )
 
+(use-package ivy-hydra
+  :straight t
+	:after ivy)
 
 (use-package swiper
   :straight t
@@ -453,7 +475,9 @@
                    (side            . bottom)
 		   (window-height . 0.66))))
   )
-
+(use-package yaml-mode
+  :straight t
+  :mode ("\\.\\(e?ya?\\|ra\\)ml\\'" . yaml-mode))
 
 (general-def
   :keymaps 'restclient-mode-map
@@ -563,6 +587,8 @@
 (use-package go-tag
   :straight t
   :after go-mode
+  :config
+  (setq go-tag-args (list "-transform" "camelcase"))
   )
 
 (use-package go-eldoc
