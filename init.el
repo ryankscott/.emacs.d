@@ -7,8 +7,6 @@
 ;;; Commentary:
 
 ;; TODO:
-;; - Fix the title bar that has the resolution in it
-;; - Get prettier
 ;; - goto def is broken
 
 ;;; Code:
@@ -523,8 +521,13 @@
   )
 
 (use-package doom-modeline
+  :straight t
+  :hook (after-init . doom-modeline-mode)
   :config
-  (+doom-modeline|init)
+  (setq doom-modeline-icon t)
+  (setq doom-modeline-major-mode-icon t)
+  (setq doom-modeline-major-mode-color-icon t)
+  (setq doom-modeline-lsp t)
   )
 
 (use-package yasnippet
