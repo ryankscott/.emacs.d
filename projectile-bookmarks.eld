@@ -1,0 +1,1 @@
+("~/Code/critters/" "~/.emacs.d/" "~/.emacs.d.doom/" "~/Code/gym_redux/" "~/Code/gym_backend/" "~/Code/gym_frontend/" "~/go/src/github.com/ryankscott/go_gymclass/" "~/go/src/github.com/ryankscott/go_gymsearch/")

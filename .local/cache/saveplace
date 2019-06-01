@@ -1,0 +1,43 @@
+;;; -*- coding: utf-8 -*-
+(("/Users/ryan/.doom.d/config.el" . 2625)
+ ("/Users/ryan/Code/critters/species.js" . 493)
+ ("/Users/ryan/Code/critters/main.js" . 756)
+ ("/Users/ryan/Code/critters/game.js" . 235)
+ ("/Users/ryan/Code/critters/fsm.js" . 48)
+ ("/Users/ryan/Code/critters/styles.css" . 157)
+ ("/Users/ryan/Code/critters/levelInfo.js" . 640)
+ ("/Users/ryan/Code/critters/index.html" . 559)
+ ("/usr/local/lib/node_modules/typescript/lib/lib.dom.d.ts" . 764161)
+ ("/Users/ryan/Code/critters/templates.js" . 158)
+ ("/Users/ryan/.emacs.d/init.el" . 2084)
+ ("/Users/ryan/.doom.d/packages.el" . 411)
+ ("/Users/ryan/.doom.d/"
+  (dired-filename . "/Users/ryan/.doom.d/config.el"))
+ ("/Users/ryan/Code/critters/.eslintrc.js" . 20)
+ ("/Users/ryan/Code/critters/.prettierrc" . 96)
+ ("/Users/ryan/Code/critters/critter.js" . 255)
+ ("/Users/ryan/Code/critters/physics.js" . 156)
+ ("/Users/ryan/Code/critters/utils.js" . 73)
+ ("/Users/ryan/Code/critters/levels.js" . 33)
+ ("/Users/ryan/Code/parser-go/"
+  (dired-filename . "/Users/ryan/Code/parser-go/parser.go"))
+ ("/Users/ryan/Code/cricd-parser/"
+  (dired-filename . "/Users/ryan/Code/cricd-parser/.git"))
+ ("/Users/ryan/Code/gym_backend/build/main.js" . 13)
+ ("/Users/ryan/Code/gym_backend/app.js" . 390)
+ ("/Users/ryan/Code/gym_backend/gym.js" . 8038)
+ ("/Users/ryan/Code/gym_redux/server/index.js" . 205)
+ ("/Users/ryan/.doom.d/init.el" . 1049)
+ ("/Users/ryan/Code/parser-go/parser.go" . 4198)
+ ("/Users/ryan/Desktop/JavaScript.xml" . 390)
+ ("/Users/ryan/Code/critters/globals.js" . 543)
+ ("/Users/ryan/Code/style.css" . 5)
+ ("/Users/ryan/"
+  (dired-filename . "/Users/ryan/.base16_theme"))
+ ("/Users/ryan/Code/critters/"
+  (dired-filename . "/Users/ryan/Code/critters/species.js"))
+ ("/Users/ryan/Code/test.html" . 7)
+ ("/Users/ryan/.emacs.d/"
+  (dired-filename . "/Users/ryan/.emacs.d/core"))
+ ("/Users/ryan/Code/"
+  (dired-filename . "/Users/ryan/Code/cryptocurrency-arbitrage")))

@@ -12,12 +12,11 @@
 ;; - goto def is broken
 
 ;;; Code:
-(when (version< emacs-version "26")
-  (error "This version of Emacs is not supported"))
-
-;; Bootstrap straight
-
+(require 'package)
 (setq package-enable-at-startup nil)
+(add-to-list 'package-archives
+             '("melpa" . "https://melpa.org/packages/") t)
+(package-initialize)
 
 (eval-and-compile
   (defvar bootstrap-version 3)
@@ -38,7 +37,6 @@
 
 
 ;; Add the lisp directory
-
 (add-to-list 'load-path (concat user-emacs-directory "lisp"))
 
 
@@ -74,6 +72,10 @@
 ;; Don't autosave
 (setq make-backup-files nil)
 
+;; Auto-indent on RET
+(define-key global-map (kbd "RET") #'comment-indent-new-line)
+
+
 ;; Remove splash screen
 (setq initial-scratch-message nil)
 (setq inhibit-splash-screen t)
@@ -83,6 +85,9 @@
 (setq scroll-step           1
       scroll-margin         0
       scroll-conservatively 10000)
+
+;; Instantly display current keystrokes in mini buffer
+(setq echo-keystrokes 0.00)
 
 ;; Hide toolbars
 (tool-bar-mode -1)
@@ -95,6 +100,11 @@
 (add-hook 'prog-mode-hook 'hs-minor-mode)
 
 ;; Add prettier to web-mode
+(setq prettier-js-args '(
+                         "--trailing-comma" "all"
+                         "--single-quote" "true"
+                         ))
+(add-hook 'js2-jsx-mode-hook 'prettier-js-mode)
 (add-hook 'web-mode-hook 'prettier-js-mode)
 
 ;; Highlight matching parens by default
@@ -102,6 +112,9 @@
 
 ;; Evil breaks cursor settings in Hydra buffers
 (setq-default cursor-in-non-selected-windows nil)
+
+;; Start fullscreen
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
 
 ;; Use path from shell for Golang
 (use-package exec-path-from-shell
@@ -126,11 +139,6 @@
         (setq beg (region-beginning) end (region-end))
       (setq beg (line-beginning-position) end (line-end-position)))
     (comment-or-uncomment-region beg end)))
-
-(defun rs-connect-media ()
-  "Opens a dired instance for my media pc."
-  (interactive)
-  (dired "/ssh:ryan@192.168.1.16:/"))
 
 ;; Themes
 
@@ -158,7 +166,6 @@
 
 
 ;; New packages
-
 (use-package hydra
   :straight t
   :config
@@ -166,7 +173,43 @@
 
 
 ;; LSP
+(use-package lsp-mode
+  :straight t
+  :init
+  (setq lsp-prefer-flymake nil)
+  (setq flymake-fringe-indicator-position 'right-fringe)
+  :config
+  (require 'lsp-clients)
+  (add-hook 'js2-mode-hook 'lsp)
+  (add-hook 'css-mode 'lsp)
+  (add-hook 'web-mode 'lsp)
+  (which-key-add-major-mode-key-based-replacements 'lsp-mode
+    "SPC ml" "lsp")
+  )
 
+(use-package lsp-ui
+  :straight t
+  :custom-face
+  (lsp-ui-doc-background ((t (:background nil))))
+  (lsp-ui-doc-header ((t (:inherit (font-lock-string-face italic)))))
+  :bind (:map lsp-ui-mode-map
+              ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
+              ([remap xref-find-references] . lsp-ui-peek-find-references)
+              ("C-c u" . lsp-ui-imenu))
+  :init (setq lsp-ui-doc-enable nil
+              lsp-ui-doc-header t
+              lsp-ui-doc-include-signature t
+              lsp-ui-doc-position 'top
+              lsp-ui-doc-use-webkit t
+              lsp-ui-doc-border (face-foreground 'default)
+
+              lsp-ui-sideline-enable nil
+              lsp-ui-sideline-ignore-duplicate t)
+  :config
+  ;; WORKAROUND Hide mode-line of the lsp-ui-imenu buffer
+  ;; https://github.com/emacs-lsp/lsp-ui/issues/243
+  (defadvice lsp-ui-imenu (after hide-lsp-ui-imenu-mode-line activate)
+    (setq mode-line-format nil)))
 
 (use-package magit
   :straight t
@@ -187,12 +230,118 @@
   :config
   (global-nlinum-mode))
 
+
 (use-package company
-  :straight t
-	:commands (global-company-mode)
-	:init
-  (add-hook 'after-init-hook #'global-company-mode)
-	)
+  :hook (after-init . global-company-mode)
+  :defines (company-dabbrev-ignore-case company-dabbrev-downcase)
+  :config
+  (setq company-tooltip-align-annotations t ; aligns annotation to the right
+        company-tooltip-limit 12            ; bigger popup window
+        company-idle-delay .2               ; decrease delay before autocompletion popup shows
+        company-echo-delay 0                ; remove annoying blinking
+        company-minimum-prefix-length 2
+        company-require-match nil
+        company-dabbrev-ignore-case nil
+        company-dabbrev-downcase nil)
+  :general
+  (:keymaps 'company-active-map
+            "TAB" #'company-complete-selection
+            "<tab>" #'company-complete-selection
+            "S-<return>" #'company-complete-selection))
+
+(use-package company-lsp
+  :ensure t
+  :after (company lsp-mode)
+  :defines company-lsp
+  :preface
+  (progn
+    (defun rs-company--lsp-mode-p ()
+      (and (bound-and-true-p lsp-mode)
+           (bound-and-true-p company-mode)))
+    (defun rs-company--setup-lsp-backend ()
+      (when (rs-company--lsp-mode-p)
+        (set (make-local-variable 'company-backends) '(company-lsp)))))
+  :config
+  (add-hook 'company-mode-hook #'rs-company--setup-lsp-backend))
+
+(use-package company-box
+  :ensure t
+  :hook (company-mode . company-box-mode)
+  :init (setq company-box-icons-alist 'company-box-icons-all-the-icons)
+  :config
+  (setq company-box-backends-colors nil)
+  (setq company-box-show-single-candidate t)
+  (setq company-box-max-candidates 50)
+  ;; Support `company-common'
+  (defun my-company-box--make-line (candidate)
+    (-let* (((candidate annotation len-c len-a backend) candidate)
+            (color (company-box--get-color backend))
+            ((c-color a-color i-color s-color) (company-box--resolve-colors color))
+            (icon-string (and company-box--with-icons-p (company-box--add-icon candidate)))
+            (candidate-string (concat (propertize company-common 'face 'company-tooltip-common)
+                                      (substring (propertize candidate 'face 'company-box-candidate) (length company-common) nil)))
+            (align-string (when annotation
+                            (concat " " (and company-tooltip-align-annotations
+                                             (propertize " " 'display `(space :align-to (- right-fringe ,(or len-a 0) 1)))))))
+            (space company-box--space)
+            (icon-p company-box-enable-icon)
+            (annotation-string (and annotation (propertize annotation 'face 'company-box-annotation)))
+            (line (concat (unless (or (and (= space 2) icon-p) (= space 0))
+                            (propertize " " 'display `(space :width ,(if (or (= space 1) (not icon-p)) 1 0.75))))
+                          (company-box--apply-color icon-string i-color)
+                          (company-box--apply-color candidate-string c-color)
+                          align-string
+                          (company-box--apply-color annotation-string a-color)))
+            (len (length line)))
+      (add-text-properties 0 len (list 'company-box--len (+ len-c len-a)
+                                       'company-box--color s-color)
+                           line)
+      line))
+  (advice-add #'company-box--make-line :override #'my-company-box--make-line)
+
+  ;; Prettify icons
+  (defun my-company-box-icons--elisp (candidate)
+    (when (derived-mode-p 'emacs-lisp-mode)
+      (let ((sym (intern candidate)))
+        (cond ((fboundp sym) 'Function)
+              ((featurep sym) 'Module)
+              ((facep sym) 'Color)
+              ((boundp sym) 'Variable)
+              ((symbolp sym) 'Text)
+              (t . nil)))))
+  (advice-add #'company-box-icons--elisp :override #'my-company-box-icons--elisp)
+
+  (with-eval-after-load 'all-the-icons
+    (declare-function all-the-icons-faicon 'all-the-icons)
+    (declare-function all-the-icons-material 'all-the-icons)
+    (setq company-box-icons-all-the-icons
+          `((Unknown . ,(all-the-icons-material "find_in_page" :height 0.9 :v-adjust -0.2))
+            (Text . ,(all-the-icons-faicon "text-width" :height 0.85 :v-adjust -0.05))
+            (Method . ,(all-the-icons-faicon "cube" :height 0.85 :v-adjust -0.05 :face 'all-the-icons-purple))
+            (Function . ,(all-the-icons-faicon "cube" :height 0.85 :v-adjust -0.05 :face 'all-the-icons-purple))
+            (Constructor . ,(all-the-icons-faicon "cube" :height 0.85 :v-adjust -0.05 :face 'all-the-icons-purple))
+            (Field . ,(all-the-icons-faicon "tag" :height 0.85 :v-adjust -0.05 :face 'all-the-icons-lblue))
+            (Variable . ,(all-the-icons-faicon "tag" :height 0.85 :v-adjust -0.05 :face 'all-the-icons-lblue))
+            (Class . ,(all-the-icons-material "settings_input_component" :height 0.9 :v-adjust -0.2 :face 'all-the-icons-orange))
+            (Interface . ,(all-the-icons-material "share" :height 0.9 :v-adjust -0.2 :face 'all-the-icons-lblue))
+            (Module . ,(all-the-icons-material "view_module" :height 0.9 :v-adjust -0.2 :face 'all-the-icons-lblue))
+            (Property . ,(all-the-icons-faicon "wrench" :height 0.85 :v-adjust -0.05))
+            (Unit . ,(all-the-icons-material "settings_system_daydream" :height 0.9 :v-adjust -0.2))
+            (Value . ,(all-the-icons-material "format_align_right" :height 0.9 :v-adjust -0.2 :face 'all-the-icons-lblue))
+            (Enum . ,(all-the-icons-material "storage" :height 0.9 :v-adjust -0.2 :face 'all-the-icons-orange))
+            (Keyword . ,(all-the-icons-material "filter_center_focus" :height 0.9 :v-adjust -0.2))
+            (Snippet . ,(all-the-icons-material "format_align_center" :height 0.9 :v-adjust -0.2))
+            (Color . ,(all-the-icons-material "palette" :height 0.9 :v-adjust -0.2))
+            (File . ,(all-the-icons-faicon "file-o" :height 0.9 :v-adjust -0.05))
+            (Reference . ,(all-the-icons-material "collections_bookmark" :height 0.9 :v-adjust -0.2))
+            (Folder . ,(all-the-icons-faicon "folder-open" :height 0.9 :v-adjust -0.05))
+            (EnumMember . ,(all-the-icons-material "format_align_right" :height 0.9 :v-adjust -0.2 :face 'all-the-icons-lblue))
+            (Constant . ,(all-the-icons-faicon "square-o" :height 0.9 :v-adjust -0.05))
+            (Struct . ,(all-the-icons-material "settings_input_component" :height 0.9 :v-adjust -0.2 :face 'all-the-icons-orange))
+            (Event . ,(all-the-icons-faicon "bolt" :height 0.85 :v-adjust -0.05 :face 'all-the-icons-orange))
+            (Operator . ,(all-the-icons-material "control_point" :height 0.9 :v-adjust -0.2))
+            (TypeParameter . ,(all-the-icons-faicon "arrows" :height 0.85 :v-adjust -0.05))
+            (Template . ,(all-the-icons-material "format_align_center" :height 0.9 :v-adjust -0.2))))))
 
 (use-package company-go
   :straight t
@@ -215,7 +364,7 @@
 
 (use-package ivy-hydra
   :straight t
-	:after ivy)
+  :after ivy)
 
 (use-package swiper
   :straight t
@@ -503,27 +652,31 @@
 (rs-leader-def
   "bb"  '(ivy-switch-buffer :which-key "prev buffer")
   "bd"  '(bury-buffer :which-key "delete buffer")
-  
+
   "SPC" '(counsel-M-x :which-key "M-x")
   "ff"  '(counsel-find-file :which-key "find file")
   ";" '(rs-comment-or-uncomment-region-or-line :which-key "comment")
-  
+
   "aa" '(align-regexp :which-key "align-regexp")
-  
+
   "v" '(er/expand-region :which-key "expand-region")
-  
+
   "uw" '(upcase-word :which-key "upcase word")
   "ur" '(upcase-region :which-key "upcase region")
-  
+
   "dw" '(downcase-word :which-key "downcase word")
   "dr" '(downcase-region :which-key "downcase region")
-  
+
   "cw" '(capitalize-word :which-key "capitalise word")
   "cr" '(capitalize-region :which-key "capitalise region")
 
   "gs" '(magit-status :which-key "magit status")
-  
+
   "se" '(evil-multiedit-match-all :which-key "multi-match-all")
+
+  "lg" '(lsp-find-definition)
+  "lr" '(lsp-find-references)
+  "lm" '(lsp-ui-imenu)
 
   "nt" '(neotree-toggle :which-key "neotree")
 
@@ -533,7 +686,7 @@
   "pb" '(counsel-projectile-switch-to-buffer :which-key "project switch to buffer")
   "ps" '(counsel-projectile-switch-project :which-key "project switch")
   "/" '(counsel-projectile-rg :which-key "project search")
-  
+
   "w/"  '(evil-window-vsplit :which-key "vertical split window")
   "w-"  '(evil-window-split :which-key "horizontal split window")
   "w="  '(balance-windows :which-key "balance windows")
@@ -544,10 +697,13 @@
   "wj" '(windmove-down :which-key "move window down")
   "wr"  '(evil-window-rotate-downwards :which-key "rotate window down")
   "wR"  '(evil-window-rotate-upwards :which-key "rotate window up")
-  
+
   "tm"  '(toggle-frame-maximized :which-key "maximise window")
   )
 
+;; Custom stuff
+(setq custom-file "~/.emacs.d/custom.el")
+(load custom-file)
 
 
 ;; Swiper definition
@@ -555,6 +711,127 @@
   "/" 'counsel-grep-or-swiper)
 
 ;; Modes
+(use-package go-mode
+  :ensure t
+  :mode ("\\.go\\'" . go-mode)
+  :preface
+  (defun rs-modules-p ()
+    "Return non-nil if this buffer is part of a Go Modules project."
+    (locate-dominating-file default-directory "go.mod"))
+
+  (defun rs-setup-go ()
+    "Run setup for Go buffers."
+    (progn
+      (if (rs-modules-p)
+          (setenv "GO111MODULE" "on")
+        (setenv "GO111MODULE" "auto"))
+      (lsp)))
+  :hook
+  (go-mode . rs-setup-go)
+  :config
+  (progn
+    (setq gofmt-command "goimports")
+    ;; (setq godoc-at-point-function 'godoc-gogetdoc)
+    (setq-local tab-width 4)
+    (setq-local indent-tabs-mode t)
+
+    (add-hook 'before-save-hook 'gofmt-before-save)
+    (push '("*go test*" :dedicated t :position bottom :stick t :noselect t :height 0.25) popwin:special-display-config)
+
+    ;; TODO: integrate with general definer
+    (which-key-add-major-mode-key-based-replacements 'go-mode
+      "SPC mr" "refactor"
+      "SPC mg" "goto"
+      "SPC mh" "help"
+      "SPC mt" "test")
+
+    (rs-local-leader-def
+     :keymaps 'go-mode-map
+     "tp" 'rs-go-run-package-tests
+     "tf" 'rs-go-run-test-current-function)))
+
+(use-package go-rename
+  :ensure t
+  :after go-mode
+  :config
+  (rs-local-leader-def
+   :keymaps 'go-mode-map
+   "rn" 'go-rename))
+
+(use-package flycheck-golangci-lint
+  :ensure t
+  :config
+  (setq flycheck-disabled-checkers '(go-gofmt
+                                     go-golint
+                                     go-vet
+                                     go-build
+                                     go-test
+                                     go-errcheck))
+  :hook (go-mode . flycheck-golangci-lint-setup))
+
+(use-package go-eldoc
+  :ensure t
+  :after go-mode
+  :config
+  (add-hook 'go-mode-hook 'go-eldoc-setup))
+
+(setq counsel-rg-base-command "rg -i -g '!.git/*' --no-heading --line-number --hidden --color never %s .")
+
+(use-package go-tag
+  :ensure t
+  :after go-mode
+  :init
+  (rs-local-leader-def
+   :keymaps 'go-mode-map
+   "rf" 'go-tag-add
+   "rF" 'go-tag-remove))
+
+(use-package godoctor
+  :ensure t
+  :init
+  (progn
+    (rs-local-leader-def
+     :keymaps 'go-mode-map
+     "re" 'godoctor-extract
+     "rt" 'godoctor-toggle
+     "rd" 'godoctor-godoc)))
+
+(use-package go-guru
+  :ensure t
+  :after go-mode
+  :init
+  (which-key-add-major-mode-key-based-replacements 'go-mode "SPC mf" "guru")
+  (rs-local-leader-def
+   :keymaps 'go-mode-map
+   "fd" 'go-guru-describe
+   "ff" 'go-guru-freevars
+   "fi" 'go-guru-implements
+   "fc" 'go-guru-peers
+   "fr" 'go-guru-referrers
+   "fj" 'go-guru-definition
+   "fp" 'go-guru-pointsto
+   "fs" 'go-guru-callstack
+   "fe" 'go-guru-whicherrs
+   "f<" 'go-guru-callers
+   "f>" 'go-guru-callees
+   "fo" 'go-guru-set-scope))
+
+(use-package go-fill-struct
+  :ensure t
+  :init
+  (rs-local-leader-def
+   :keymaps 'go-mode-map
+   "rs" 'go-fill-struct))
+
+(use-package go-impl
+  :ensure t
+  :init
+  (rs-local-leader-def
+   :keymaps 'go-mode-map
+   "ri" 'go-impl))
+
+
+
 (use-package go-mode
   :straight t
   :mode ("\\.go\\'" . go-mode)
@@ -621,6 +898,40 @@
   "ta" '(go-tag-add :which-key "go-tag-add")
   "tr" '(go-tag-remove :which-key "go-tag-remove")
   )
+
+;; Improved JavaScript editing mode
+(use-package js2-mode
+  :ensure t
+  :defines flycheck-javascript-eslint-executable
+  :mode (("\\.js\\'" . js2-mode)
+         ("\\.jsx\\'" . js2-jsx-mode))
+  :interpreter (("node" . js2-mode)
+                ("node" . js2-jsx-mode))
+  :hook ((js2-mode . js2-imenu-extras-mode)
+         (js2-mode . js2-highlight-unused-variables-mode))
+  :config
+  ;; Use default keybindings for lsp
+  (unbind-key "M-." js2-mode-map)
+  (with-eval-after-load "lsp-javascript-typescript"
+    (add-hook 'js2-mode-hook #'lsp))
+  (when (featurep! +lsp)
+    (add-hook! (js2-mode typescript-mode) #'lsp!))
+
+  (with-eval-after-load 'flycheck
+    (if (or (executable-find "eslint_d")
+            (executable-find "eslint")
+            (executable-find "jshint"))
+	(setq js2-mode-show-strict-warnings nil))
+    (if (executable-find "eslint_d")
+	;; https://github.com/mantoni/eslint_d.js
+	;; npm -i -g eslint_d
+	(setq flycheck-javascript-eslint-executable "eslint_d"))))
+
+(use-package js2-refactor
+  :ensure t
+  :diminish js2-refactor-mode
+  :hook (js2-mode . js2-refactor-mode)
+  :config (js2r-add-keybindings-with-prefix "C-c C-m"))
 
 (use-package web-mode
   :straight t
