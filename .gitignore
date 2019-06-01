@@ -1,6 +1,7 @@
 straight/
 auto-save-list/
 url/
+.local/
 elpa/
 *.cache
 *.eld
