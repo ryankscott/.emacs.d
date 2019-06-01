@@ -648,6 +648,11 @@
   :keymaps 'override
   :non-normal-prefix "M-SPC")
 
+(general-create-definer rs-local-leader-def
+  :states 'motion
+  :keymaps 'override
+:prefix "SPC m")
+
 
 (rs-leader-def
   "bb"  '(ivy-switch-buffer :which-key "prev buffer")
