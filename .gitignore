@@ -2,3 +2,5 @@ straight/
 auto-save-list/
 url/
 elpa/
+*.cache
+*.eld
