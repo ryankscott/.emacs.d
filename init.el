@@ -33,6 +33,9 @@
 
 (require 'straight bootstrap-file t)
 
+;; Auto-save to a backup directory
+(setq backup-directory-alist
+      `(("." . ,(concat user-emacs-directory "backups"))))
 
 ;; Add the lisp directory
 (add-to-list 'load-path (concat user-emacs-directory "lisp"))
@@ -138,6 +141,12 @@
       (setq beg (line-beginning-position) end (line-end-position)))
     (comment-or-uncomment-region beg end)))
 
+(defun rs-find-user-init-file ()
+  "Edit the `user-init-file', in another window."
+  (interactive)
+  (find-file-other-window user-init-file))
+
+
 ;; Themes
 
 (set-default-font "Fira Code 14" nil t)
@@ -146,6 +155,7 @@
 ;; Smart tabs
 (require 'smart-tab)
 (global-smart-tab-mode 1)
+
 
 
 (use-package doom-themes
@@ -169,6 +179,8 @@
   :config
   (setq lv-use-separator t))
 
+;; TODOS in project
+
 
 ;; LSP
 (use-package lsp-mode
@@ -181,15 +193,7 @@
   (add-hook 'js2-mode-hook 'lsp)
   (add-hook 'css-mode 'lsp)
   (add-hook 'web-mode 'lsp)
-  (which-key-add-major-mode-key-based-replacements 'lsp-mode
-    "SPC ml" "lsp")
   )
-
-;; LSP debugging
-
-(setq lsp-print-io t)
-(setq lsp-trace t)
-(setq lsp-print-performance t)
 
 (use-package lsp-ui
   :straight t
@@ -247,11 +251,7 @@
         company-require-match nil
         company-dabbrev-ignore-case nil
         company-dabbrev-downcase nil)
-  :general
-  (:keymaps 'company-active-map
-            "TAB" #'company-complete-selection
-            "<tab>" #'company-complete-selection
-            "S-<return>" #'company-complete-selection))
+  )
 
 (use-package company-lsp
   :ensure t
@@ -662,6 +662,8 @@
   :keymaps 'override
 :prefix "SPC m")
 
+;; TODOs in project
+(require 'doom-todo-ivy)
 
 (rs-leader-def
   "bb"  '(ivy-switch-buffer :which-key "prev buffer")
@@ -674,6 +676,8 @@
   "aa" '(align-regexp :which-key "align-regexp")
 
   "v" '(er/expand-region :which-key "expand-region")
+
+  "ie" '(rs-find-user-init-file :which-key "edit init")
 
   "uw" '(upcase-word :which-key "upcase word")
   "ur" '(upcase-region :which-key "upcase region")
@@ -696,9 +700,10 @@
 
   "pn" '(neotree-projectile-action :which-key "project tree")
   "pf" '(counsel-projectile-find-file :which-key "project find file")
-
   "pb" '(counsel-projectile-switch-to-buffer :which-key "project switch to buffer")
   "ps" '(counsel-projectile-switch-project :which-key "project switch")
+  "pt" '(doom/ivy-tasks :which-key "project todos")
+
   "/" '(counsel-projectile-rg :which-key "project search")
 
   "w/"  '(evil-window-vsplit :which-key "vertical split window")
@@ -728,20 +733,6 @@
 (use-package go-mode
   :ensure t
   :mode ("\\.go\\'" . go-mode)
-  :preface
-  (defun rs-modules-p ()
-    "Return non-nil if this buffer is part of a Go Modules project."
-    (locate-dominating-file default-directory "go.mod"))
-
-  (defun rs-setup-go ()
-    "Run setup for Go buffers."
-    (progn
-      (if (rs-modules-p)
-          (setenv "GO111MODULE" "on")
-        (setenv "GO111MODULE" "auto"))
-      (lsp)))
-  :hook
-  (go-mode . rs-setup-go)
   :config
   (progn
     (setq gofmt-command "goimports")
@@ -750,19 +741,7 @@
     (setq-local indent-tabs-mode t)
 
     (add-hook 'before-save-hook 'gofmt-before-save)
-    (push '("*go test*" :dedicated t :position bottom :stick t :noselect t :height 0.25) popwin:special-display-config)
-
-    ;; TODO: integrate with general definer
-    (which-key-add-major-mode-key-based-replacements 'go-mode
-      "SPC mr" "refactor"
-      "SPC mg" "goto"
-      "SPC mh" "help"
-      "SPC mt" "test")
-
-    (rs-local-leader-def
-     :keymaps 'go-mode-map
-     "tp" 'rs-go-run-package-tests
-     "tf" 'rs-go-run-test-current-function)))
+    ))
 
 (use-package go-rename
   :ensure t
@@ -841,52 +820,9 @@
   :ensure t
   :init
   (rs-local-leader-def
-   :keymaps 'go-mode-map
-   "ri" 'go-impl))
+	:keymaps 'go-mode-map
+	"ri" 'go-impl))
 
-
-
-(use-package go-mode
-  :straight t
-  :mode ("\\.go\\'" . go-mode)
-  :config
-  (progn
-    (setq-local tab-width 4)
-    (setq-local indent-tabs-mode t)
-    (setq gofmt-command "goreturns")
-    (setq godoc-at-point-function 'godoc-gogetdoc)
-    (setq gofmt-show-errors nil)
-    (add-hook 'before-save-hook #'gofmt-before-save))
-
-  :functions (gofmt-before-save godoc-at-point))
-
-(use-package go-rename
-  :straight t
-  :after go-mode
-  )
-
-(use-package godoctor
-  :straight t
-  :init
-  )
-
-(use-package go-rename
-  :straight t
-  :after go-mode
-  )
-
-(use-package go-tag
-  :straight t
-  :after go-mode
-  :config
-  (setq go-tag-args (list "-transform" "camelcase"))
-  )
-
-(use-package go-eldoc
-  :straight t
-  :after go-mode
-  :config
-  (add-hook 'go-mode-hook 'go-eldoc-setup))
 
 (general-def
   :keymaps 'go-mode-map
@@ -976,6 +912,8 @@
 
 
 (put 'downcase-region 'disabled nil)
+
+
 
 (provide 'init)
 ;;; init.el ends here
