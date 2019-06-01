@@ -187,6 +187,12 @@
     "SPC ml" "lsp")
   )
 
+;; LSP debugging
+
+(setq lsp-print-io t)
+(setq lsp-trace t)
+(setq lsp-print-performance t)
+
 (use-package lsp-ui
   :straight t
   :custom-face
@@ -913,14 +919,13 @@
   :interpreter (("node" . js2-mode)
                 ("node" . js2-jsx-mode))
   :hook ((js2-mode . js2-imenu-extras-mode)
-         (js2-mode . js2-highlight-unused-variables-mode))
+         (js2-mode . js2-highlight-unused-variables-mode)
+	 ((js2-mode typescript-mode-hook) . lsp))
   :config
   ;; Use default keybindings for lsp
   (unbind-key "M-." js2-mode-map)
   (with-eval-after-load "lsp-javascript-typescript"
     (add-hook 'js2-mode-hook #'lsp))
-  (when (featurep! +lsp)
-    (add-hook! (js2-mode typescript-mode) #'lsp!))
 
   (with-eval-after-load 'flycheck
     (if (or (executable-find "eslint_d")

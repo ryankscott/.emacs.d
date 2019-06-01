@@ -1,7 +1,9 @@
 straight/
+transient/
 auto-save-list/
 url/
 .local/
 elpa/
+.lsp*
 *.cache
 *.eld
