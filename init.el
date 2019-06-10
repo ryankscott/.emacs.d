@@ -7,7 +7,8 @@
 ;;; Commentary:
 
 ;; TODO:
-;; - goto def is broken
+;; Fix stuff
+
 
 ;;; Code:
 (require 'package)
@@ -39,7 +40,6 @@
 
 ;; Add the lisp directory
 (add-to-list 'load-path (concat user-emacs-directory "lisp"))
-
 
 ;; Install some basic packages
 
@@ -105,7 +105,7 @@
                          "--trailing-comma" "all"
                          "--single-quote" "true"
                          ))
-(add-hook 'js2-jsx-mode-hook 'prettier-js-mode)
+(add-hook 'js2-mode-hook 'prettier-js-mode)
 (add-hook 'web-mode-hook 'prettier-js-mode)
 
 ;; Highlight matching parens by default
@@ -151,12 +151,43 @@
 
 (set-default-font "Fira Code 14" nil t)
 
-
 ;; Smart tabs
 (require 'smart-tab)
 (global-smart-tab-mode 1)
 
+(use-package diff-hl
+  :straight t
+  :after magit
+  :preface
+  (progn
+    (defun rs-magit--diff-hl-mode-on ()
+      (diff-hl-mode -1))
 
+    (defun rs-magit--diff-hl-mode-off ()
+      (diff-hl-mode +1)))
+  :init
+  (progn
+    (evil-transient-state-define git-hunks
+      :title "Git Hunk Transient State"
+      :doc "
+[_p_/_N_] previous [_n_] next [_g_] goto [_x_] revert [_q_] quit"
+      :foreign-keys run
+      :bindings
+      ("n" diff-hl-next-hunk)
+      ("N" diff-hl-previous-hunk)
+      ("p" diff-hl-previous-hunk)
+      ("g" diff-hl-diff-goto-hunk)
+      ("x" diff-hl-revert-hunk)
+      ("q" nil :exit t))
+
+    (rs-leader-def
+      "g." 'git-hunks-transient-state/body))
+  :config
+  (progn
+    (add-hook 'iedit-mode-hook #'rs-magit--diff-hl-mode-on)
+    (add-hook 'iedit-mode-end-hook #'rs-magit--diff-hl-mode-off)
+    (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
+(global-diff-hl-mode)))
 
 (use-package doom-themes
   :preface (defvar region-fg nil)
@@ -167,7 +198,6 @@
     (setq doom-themes-enable-bold nil)
     (setq doom-themes-enable-italic nil)
     (setq nlinum-highlight-current-line t)
-    (doom-themes-visual-bell-config)
     (doom-themes-neotree-config)
     (load-theme 'doom-solarized-light t)
     ))
@@ -528,6 +558,8 @@
   (setq doom-modeline-major-mode-icon t)
   (setq doom-modeline-major-mode-color-icon t)
   (setq doom-modeline-lsp t)
+  (setq doom-modeline-buffer-state-icon nil)
+  (setq doom-modeline-buffer-modification-icon nil)
   )
 
 (use-package yasnippet
@@ -547,6 +579,7 @@
 (use-package all-the-icons
   :straight t
   )
+
 
 (use-package json-mode
   :straight t
@@ -598,9 +631,33 @@
   )
 
 
-(use-package neotree
+(use-package treemacs
   :straight t
+  :defer t
+  :commands (treemacs
+             treemacs-add-project-to-workspace
+             treemacs-toggle
+             treemacs-mode
+             treemacs-next-line
+			 treemacs-previous-line)
   )
+
+(use-package treemacs-evil
+  :after treemacs evil
+  :ensure t)
+
+(use-package treemacs-projectile
+  :after treemacs projectile
+  :ensure t)
+
+(use-package treemacs-icons-dired
+  :after treemacs dired
+  :ensure t
+  :config (treemacs-icons-dired-mode))
+
+(use-package treemacs-magit
+  :after treemacs magit
+  :ensure t)
 
 (use-package sql-indent
   :straight (:host github :repo "alex-hhh/emacs-sql-indent"
@@ -698,7 +755,7 @@
 
   "nt" '(neotree-toggle :which-key "neotree")
 
-  "pn" '(neotree-projectile-action :which-key "project tree")
+  "pn" '(treemacs :which-key "project tree")
   "pf" '(counsel-projectile-find-file :which-key "project find file")
   "pb" '(counsel-projectile-switch-to-buffer :which-key "project switch to buffer")
   "ps" '(counsel-projectile-switch-project :which-key "project switch")
