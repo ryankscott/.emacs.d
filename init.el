@@ -170,20 +170,21 @@
     (add-hook 'iedit-mode-hook #'rs-magit--diff-hl-mode-on)
     (add-hook 'iedit-mode-end-hook #'rs-magit--diff-hl-mode-off)
     (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
-    (global-diff-hl-mode)))
-
-(use-package doom-themes
-  :preface (defvar region-fg nil)
-  :straight t
-  :config
-  (progn
-    (require 'doom-themes)
-    (setq doom-themes-enable-bold nil)
-    (setq doom-themes-enable-italic nil)
-    (setq nlinum-highlight-current-line t)
-    (doom-themes-neotree-config)
-    (load-theme 'doom-solarized-light t)
     ))
+  (global-diff-hl-mode)
+
+  (use-package doom-themes
+    :preface (defvar region-fg nil)
+    :straight t
+    :config
+    (progn
+      (require 'doom-themes)
+      (setq doom-themes-enable-bold nil)
+      (setq doom-themes-enable-italic nil)
+      (setq nlinum-highlight-current-line t)
+      (doom-themes-neotree-config)
+      (load-theme 'doom-solarized-light t)
+      ))
 
 
 ;; New packages

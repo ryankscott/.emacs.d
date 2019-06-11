@@ -15,7 +15,8 @@
  '(hi-yellow ((t (:weight semi-bold :background nil))))
  '(lsp-ui-doc-background ((t (:background nil))))
  '(lsp-ui-doc-header ((t (:inherit (font-lock-string-face italic)))))
- '(diff-hl-change ((t (:foreground "#268bd2" :background "#90c5ea"))))
- '(diff-hl-delete ((t (:foreground "#dc322f" :background "#ed9896"))))
- '(diff-hl-insert ((t (:foreground "#859900" :background "#e7ff4c"))))
+ '(diff-hl-change ((t (:foreground "#268bd2" :background "#d2e7f6"))))
+ '(diff-hl-delete ((t (:foreground "#dc322f" :background "#f8d6d5"))))
+ '(diff-hl-insert ((t (:foreground "#35D226" :background "#d5f6d2"))))
  )
+
