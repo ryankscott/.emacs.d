@@ -165,29 +165,12 @@
 
     (defun rs-magit--diff-hl-mode-off ()
       (diff-hl-mode +1)))
-  :init
-  (progn
-    (evil-transient-state-define git-hunks
-      :title "Git Hunk Transient State"
-      :doc "
-[_p_/_N_] previous [_n_] next [_g_] goto [_x_] revert [_q_] quit"
-      :foreign-keys run
-      :bindings
-      ("n" diff-hl-next-hunk)
-      ("N" diff-hl-previous-hunk)
-      ("p" diff-hl-previous-hunk)
-      ("g" diff-hl-diff-goto-hunk)
-      ("x" diff-hl-revert-hunk)
-      ("q" nil :exit t))
-
-    (rs-leader-def
-      "g." 'git-hunks-transient-state/body))
   :config
   (progn
     (add-hook 'iedit-mode-hook #'rs-magit--diff-hl-mode-on)
     (add-hook 'iedit-mode-end-hook #'rs-magit--diff-hl-mode-off)
     (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
-(global-diff-hl-mode)))
+    (global-diff-hl-mode)))
 
 (use-package doom-themes
   :preface (defvar region-fg nil)
