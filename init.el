@@ -211,12 +211,8 @@
   :init
   (setq lsp-prefer-flymake nil)
   (setq flymake-fringe-indicator-position 'right-fringe)
-  :config
-  (require 'lsp-clients)
-  (add-hook 'js2-mode-hook 'lsp)
-  (add-hook 'css-mode 'lsp)
-  (add-hook 'web-mode 'lsp)
-  (add-hook 'go-mode 'lsp)
+  :commands lsp
+  :hook (prog-mode . lsp)
   )
 
 (use-package lsp-ui
@@ -234,7 +230,6 @@
               lsp-ui-doc-position 'top
               lsp-ui-doc-use-webkit t
               lsp-ui-doc-border (face-foreground 'default)
-
               lsp-ui-sideline-enable nil
               lsp-ui-sideline-ignore-duplicate t)
   :config
@@ -278,22 +273,16 @@
   )
 
 (use-package company-lsp
-  :ensure t
-  :after (company lsp-mode)
-  :defines company-lsp
-  :preface
-  (progn
-    (defun rs-company--lsp-mode-p ()
-      (and (bound-and-true-p lsp-mode)
-           (bound-and-true-p company-mode)))
-    (defun rs-company--setup-lsp-backend ()
-      (when (rs-company--lsp-mode-p)
-        (set (make-local-variable 'company-backends) '(company-lsp)))))
+  :straight t
+  :commands company-lsp
   :config
-  (add-hook 'company-mode-hook #'rs-company--setup-lsp-backend))
+  (push 'company-lsp company-backends)
+  (setq company-lsp-async t
+        company-lsp-cache-candidates 'auto
+        company-lsp-enable-recompletion t))
 
 (use-package company-box
-  :ensure t
+  :straight t
   :hook (company-mode . company-box-mode)
   :init (setq company-box-icons-alist 'company-box-icons-all-the-icons)
   :config
