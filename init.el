@@ -41,10 +41,6 @@
 ;; Add the lisp directory
 (add-to-list 'load-path (concat user-emacs-directory "lisp"))
 
-;; Disable annoying startup check
-(setq exec-path-from-shell-check-startup-files nil)
-(exec-path-from-shell-initialize)
-
 ;; Install some basic packages
 (straight-use-package 'dash)
 (straight-use-package 'dash-functional)
@@ -165,6 +161,7 @@
 (use-package exec-path-from-shell
   :straight t
   :config
+  (setq exec-path-from-shell-check-startup-files nil)
   (exec-path-from-shell-initialize)
   (exec-path-from-shell-copy-env "GOPATH"))
 
