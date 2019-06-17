@@ -41,14 +41,19 @@
 ;; Add the lisp directory
 (add-to-list 'load-path (concat user-emacs-directory "lisp"))
 
-;; Install some basic packages
+;; Disable annoying startup check
+(setq exec-path-from-shell-check-startup-files nil)
+(exec-path-from-shell-initialize)
 
+;; Install some basic packages
 (straight-use-package 'dash)
 (straight-use-package 'dash-functional)
 (straight-use-package 'f)
 (straight-use-package 's)
 (straight-use-package 'noflet)
 (straight-use-package 'memoize)
+(straight-use-package 'use-package)
+(straight-use-package 'bind-map)
 
 
 ;; Set up personal settings
@@ -58,13 +63,10 @@
 
 (defconst use-package-verbose t)
 
-(straight-use-package 'use-package)
-(straight-use-package 'bind-map)
 
 (eval-when-compile
   (require 'recentf)
   (require 'use-package))
-
 
 ;; Basic settings
 (defalias #'yes-or-no-p #'y-or-n-p)
@@ -76,6 +78,13 @@
 ;; Auto-indent on RET
 (define-key global-map (kbd "RET") #'comment-indent-new-line)
 
+;; Ambient title bar
+(when (eq system-type 'darwin)
+  (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
+  (add-to-list 'default-frame-alist '(ns-appearance . 'nil))
+  (setq frame-title-format nil))
+
+(put 'downcase-region 'disabled nil)
 
 ;; Remove splash screen
 (setq initial-scratch-message nil)
@@ -117,12 +126,6 @@
 ;; Start fullscreen
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
-;; Use path from shell for Golang
-(use-package exec-path-from-shell
-  :straight t
-  :config
-  (exec-path-from-shell-initialize)
-  (exec-path-from-shell-copy-env "GOPATH"))
 
 ;; Enable commands.
 (put 'narrow-to-region 'disabled nil)
@@ -144,17 +147,28 @@
 (defun rs-find-user-init-file ()
   "Edit the `user-init-file', in another window."
   (interactive)
-  (find-file-other-window user-init-file))
+  (find-file user-init-file))
 
 
 ;; Themes
 
 (set-default-font "Fira Code 14" nil t)
 
+
 ;; Smart tabs
 (require 'smart-tab)
 (global-smart-tab-mode 1)
 
+;; Packages
+
+;; Use path from shell for Golang
+(use-package exec-path-from-shell
+  :straight t
+  :config
+  (exec-path-from-shell-initialize)
+  (exec-path-from-shell-copy-env "GOPATH"))
+
+;; diff-hl provides git diff highlights
 (use-package diff-hl
   :straight t
   :after magit
@@ -171,20 +185,21 @@
     (add-hook 'iedit-mode-end-hook #'rs-magit--diff-hl-mode-off)
     (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
     ))
-  (global-diff-hl-mode)
+(global-diff-hl-mode)
 
-  (use-package doom-themes
-    :preface (defvar region-fg nil)
-    :straight t
-    :config
-    (progn
-      (require 'doom-themes)
-      (setq doom-themes-enable-bold nil)
-      (setq doom-themes-enable-italic nil)
-      (setq nlinum-highlight-current-line t)
-      (doom-themes-neotree-config)
-      (load-theme 'doom-solarized-light t)
-      ))
+;; themes
+(use-package doom-themes
+  :preface (defvar region-fg nil)
+  :straight t
+  :config
+  (progn
+    (require 'doom-themes)
+    (setq doom-themes-enable-bold nil)
+    (setq doom-themes-enable-italic nil)
+    (setq nlinum-highlight-current-line t)
+    (doom-themes-neotree-config)
+    (load-theme 'doom-solarized-light t)
+    ))
 
 
 ;; New packages
@@ -192,9 +207,6 @@
   :straight t
   :config
   (setq lv-use-separator t))
-
-;; TODOS in project
-
 
 ;; LSP
 (use-package lsp-mode
@@ -207,6 +219,7 @@
   (add-hook 'js2-mode-hook 'lsp)
   (add-hook 'css-mode 'lsp)
   (add-hook 'web-mode 'lsp)
+  (add-hook 'go-mode 'lsp)
   )
 
 (use-package lsp-ui
@@ -361,18 +374,6 @@
             (TypeParameter . ,(all-the-icons-faicon "arrows" :height 0.85 :v-adjust -0.05))
             (Template . ,(all-the-icons-material "format_align_center" :height 0.9 :v-adjust -0.2))))))
 
-(use-package company-go
-  :straight t
-  :after go-mode
-  :config
-  (progn
-    (setq company-go-show-annotation t)
-    (setq company-idle-delay .2)
-    (setq company-echo-delay 0)
-    (add-hook 'go-mode-hook
-	      (lambda ()
-		(set (make-local-variable 'company-backends) '(company-go))
-		(company-mode)))))
 
 (use-package ivy
   :straight t
@@ -455,16 +456,12 @@
   (indent-according-to-mode)
   )
 
-
-
-
 (use-package iedit
   :straight t
   :config
   (progn
     (setq iedit-toggle-key-default nil))
   )
-
 
 (use-package evil
   :straight t
@@ -563,7 +560,6 @@
 (use-package all-the-icons
   :straight t
   )
-
 
 (use-package json-mode
   :straight t
@@ -678,6 +674,8 @@
   :straight t
   :mode ("\\.\\(e?ya?\\|ra\\)ml\\'" . yaml-mode))
 
+;; Key mappings
+
 (general-def
   :keymaps 'restclient-mode-map
   :states 'motion
@@ -691,7 +689,7 @@
   "C-n" '(restclient-jump-next :which-key "jump-next")
   "C-p" '(restclient-jump-prev :which-key "jump-prev")
   )
-;; Key mappings
+
 (general-create-definer rs-leader-def
   :states '(normal visual insert emacs)
   :prefix "SPC"
@@ -780,7 +778,8 @@
     ;; (setq godoc-at-point-function 'godoc-gogetdoc)
     (setq-local tab-width 4)
     (setq-local indent-tabs-mode t)
-
+    (lsp)
+    (setq-local flycheck-disabled-checkers '(go-build go-errcheck go-vet go-test))
     (add-hook 'before-save-hook 'gofmt-before-save)
     ))
 
@@ -789,19 +788,9 @@
   :after go-mode
   :config
   (rs-local-leader-def
-   :keymaps 'go-mode-map
-   "rn" 'go-rename))
+    :keymaps 'go-mode-map
+    "rn" 'go-rename))
 
-(use-package flycheck-golangci-lint
-  :ensure t
-  :config
-  (setq flycheck-disabled-checkers '(go-gofmt
-                                     go-golint
-                                     go-vet
-                                     go-build
-                                     go-test
-                                     go-errcheck))
-  :hook (go-mode . flycheck-golangci-lint-setup))
 
 (use-package go-eldoc
   :ensure t
@@ -944,17 +933,6 @@
   :straight t
   :after web-mode
   )
-
-;; Ambient title bar
-(when (eq system-type 'darwin)
-  (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
-  (add-to-list 'default-frame-alist '(ns-appearance . 'nil))
-  (setq frame-title-format nil))
-
-
-(put 'downcase-region 'disabled nil)
-
-
 
 (provide 'init)
 ;;; init.el ends here
