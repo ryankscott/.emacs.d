@@ -147,7 +147,6 @@
 
 
 ;; Themes
-
 (set-default-font "Fira Code 14" nil t)
 
 
@@ -454,10 +453,6 @@
   :config
   (evil-mode +1)
   (define-key evil-normal-state-map "r" 'undo-tree-redo)
-  (evil-define-key 'normal neotree-mode-map (kbd "TAB") 'neotree-enter)
-  (evil-define-key 'normal neotree-mode-map (kbd "SPC") 'neotree-quick-look)
-  (evil-define-key 'normal neotree-mode-map (kbd "q") 'neotree-hide)
-  (evil-define-key 'normal neotree-mode-map (kbd "RET") 'neotree-enter)
   )
 
 (use-package evil-multiedit
@@ -605,7 +600,7 @@
              treemacs-toggle
              treemacs-mode
              treemacs-next-line
-			 treemacs-previous-line)
+	     treemacs-previous-line)
   )
 
 (use-package treemacs-evil
@@ -626,8 +621,7 @@
   :ensure t)
 
 (use-package sql-indent
-  :straight (:host github :repo "alex-hhh/emacs-sql-indent"
-                   :branch "master")
+  :straight (:host github :repo "alex-hhh/emacs-sql-indent" :branch "master")
   :after sql
   :config
   (add-hook 'sql-mode-hook #'sqlind-minor-mode)
@@ -660,6 +654,9 @@
   :straight t
   :mode ("\\.\\(e?ya?\\|ra\\)ml\\'" . yaml-mode))
 
+;; TODOs in project
+(require 'doom-todo-ivy)
+
 ;; Key mappings
 
 (general-def
@@ -670,11 +667,6 @@
   "o" '(restclient-http-send-current-stay-in-window :which-key "send-current-in-window")
   )
 
-(general-def
-  :keymaps 'restclient-mode-map
-  "C-n" '(restclient-jump-next :which-key "jump-next")
-  "C-p" '(restclient-jump-prev :which-key "jump-prev")
-  )
 
 (general-create-definer rs-leader-def
   :states '(normal visual insert emacs)
@@ -685,63 +677,60 @@
 (general-create-definer rs-local-leader-def
   :states 'motion
   :keymaps 'override
-:prefix "SPC m")
+  :prefix "SPC m")
 
-;; TODOs in project
-(require 'doom-todo-ivy)
 
 (rs-leader-def
+  ;; Buffers
   "bb"  '(ivy-switch-buffer :which-key "prev buffer")
   "bd"  '(bury-buffer :which-key "delete buffer")
-
+  
+  ;; General keys
   "SPC" '(counsel-M-x :which-key "M-x")
   "ff"  '(counsel-find-file :which-key "find file")
+
+  ;; Text manipulation
   ";" '(rs-comment-or-uncomment-region-or-line :which-key "comment")
-
   "aa" '(align-regexp :which-key "align-regexp")
-
   "v" '(er/expand-region :which-key "expand-region")
-
-  "ie" '(rs-find-user-init-file :which-key "edit init")
-
   "uw" '(upcase-word :which-key "upcase word")
   "ur" '(upcase-region :which-key "upcase region")
-
   "dw" '(downcase-word :which-key "downcase word")
   "dr" '(downcase-region :which-key "downcase region")
-
   "cw" '(capitalize-word :which-key "capitalise word")
   "cr" '(capitalize-region :which-key "capitalise region")
-
-  "gs" '(magit-status :which-key "magit status")
-
   "se" '(evil-multiedit-match-all :which-key "multi-match-all")
 
+  ;; Init file
+  "ie" '(rs-find-user-init-file :which-key "edit init")
+
+  ;; Magit
+  "gs" '(magit-status :which-key "magit status")
+  
+  ;; LSP
   "lg" '(lsp-find-definition)
   "lr" '(lsp-find-references)
   "lm" '(lsp-ui-imenu)
-
-  "nt" '(neotree-toggle :which-key "neotree")
-
+  
+  ;; Projects
   "pn" '(treemacs :which-key "project tree")
   "pf" '(counsel-projectile-find-file :which-key "project find file")
   "pb" '(counsel-projectile-switch-to-buffer :which-key "project switch to buffer")
   "ps" '(counsel-projectile-switch-project :which-key "project switch")
   "pt" '(doom/ivy-tasks :which-key "project todos")
-
   "/" '(counsel-projectile-rg :which-key "project search")
-
+  
+  ;; Window management
   "w/"  '(evil-window-vsplit :which-key "vertical split window")
   "w-"  '(evil-window-split :which-key "horizontal split window")
   "w="  '(balance-windows :which-key "balance windows")
   "wd"  '(evil-window-delete :which-key "delete window")
-  "wh" '(windmove-left :which-key "move window left")
-  "wl" '(windmove-right :which-key "move window right")
-  "wk" '(windmove-up :which-key "move window up")
-  "wj" '(windmove-down :which-key "move window down")
+  "wh"  '(windmove-left :which-key "move window left")
+  "wl"  '(windmove-right :which-key "move window right")
+  "wk"  '(windmove-up :which-key "move window up")
+  "wj"  '(windmove-down :which-key "move window down")
   "wr"  '(evil-window-rotate-downwards :which-key "rotate window down")
   "wR"  '(evil-window-rotate-upwards :which-key "rotate window up")
-
   "tm"  '(toggle-frame-maximized :which-key "maximise window")
   )
 
@@ -895,25 +884,24 @@
 (use-package js2-refactor
   :ensure t
   :diminish js2-refactor-mode
-  :hook (js2-mode . js2-refactor-mode)
-  :config (js2r-add-keybindings-with-prefix "C-c C-m"))
+  :hook (js2-mode . js2-refactor-mode))
 
-(use-package web-mode
-  :straight t
-  :config
-  (require 'web-mode)
-  (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.json\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.css\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.xml\\'" . web-mode))
-  )
+  (use-package web-mode
+    :straight t
+    :config
+    (require 'web-mode)
+    (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.json\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.css\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.xml\\'" . web-mode))
+    )
 
 (use-package prettier-js
   :straight t
