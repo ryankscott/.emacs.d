@@ -908,5 +908,8 @@
   :after web-mode
   )
 
+(use-package tiny
+  :straight t)
+
 (provide 'init)
 ;;; init.el ends here
